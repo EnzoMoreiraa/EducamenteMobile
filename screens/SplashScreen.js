@@ -9,7 +9,7 @@ export default function SplashScreen({ navigation }) {
       <Text style={styles.title}>EducaMente</Text>
 
       <Image
-        source={require("../../assets/educamente-logo.gif")}
+        source={require("../assets/educamente-logo.gif")}
         style={styles.mainLogo}
         resizeMode="contain"
       />

@@ -32,7 +32,7 @@ export default function HomeScreen({ navigation }) {
           onPress={() => navigation.navigate("CheckinDiario")}
         >
           <Image
-            source={require("../../assets/meter-icon.png")}
+            source={require("../assets/meter-icon.png")}
             style={styles.meterImage}
             resizeMode="contain"
           />
@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation }) {
           >
             <View style={styles.autocuidadoBadge}>
               <Image
-                source={require("../../assets/check-icon.png")}
+                source={require("../assets/check-icon.png")}
                 style={styles.autocuidadoBadgeIcon}
                 resizeMode="contain"
               />

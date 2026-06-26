@@ -6,7 +6,7 @@ export function AuthHeader({ onBack }) {
   return (
     <View style={styles.authHeaderContainer}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Image source={require("../../assets/back-icon.png")} style={styles.backIcon} />
+        <Image source={require("../assets/back-icon.png")} style={styles.backIcon} />
       </TouchableOpacity>
     </View>
   );

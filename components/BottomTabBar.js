@@ -4,11 +4,11 @@ import { COLORS } from "../styles/theme";
 // Bottom bar fixa usada nas telas internas do app (a partir da Home)
 export default function BottomTabBar({ navigation, active }) {
   const tabs = [
-    { key: "Calendar", icon: require("../../assets/calendar-icon.png") },
-    { key: "Chat", icon: require("../../assets/chat-icon.png") },
-    { key: "Home", icon: require("../../assets/home-icon.png") },
+    { key: "Calendar", icon: require("../assets/calendar-icon.png") },
+    { key: "Chat", icon: require("../assets/chat-icon.png") },
+    { key: "Home", icon: require("../assets/home-icon.png") },
     { key: "Autocuidado", icon: null, emoji: "♡" },
-    { key: "Profile", icon: require("../../assets/profile-icon.png") },
+    { key: "Profile", icon: require("../assets/profile-icon.png") },
   ];
 
   return (

@@ -89,13 +89,13 @@ export default function LoginScreen({ navigation, route }) {
 
         <View style={styles.socialRow}>
           <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../../assets/gmail-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+            <Image source={require("../assets/gmail-logo.png")} style={styles.socialIcon} resizeMode="contain" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../../assets/apple-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+            <Image source={require("../assets/apple-logo.png")} style={styles.socialIcon} resizeMode="contain" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../../assets/microsoft-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+            <Image source={require("../assets/microsoft-logo.png")} style={styles.socialIcon} resizeMode="contain" />
           </TouchableOpacity>
         </View>
       </ScrollView>
