@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Path, Rect } from "react-native-svg";
 import { ScreenHeader } from "../components/Headers";
 import { COLORS, SIZES } from "../styles/theme";
 
 // Opções de humor, da esquerda (mais triste) para a direita (mais feliz),
 // espelhando as cores do arco no protótipo Figma.
 const MOODS = [
-  { key: "muito_triste", label: "Me sinto muito mal", face: "︵", color: COLORS.moodVeryBad },
-  { key: "triste", label: "Me sinto mal", face: "⌢", color: COLORS.moodSad },
-  { key: "neutro", label: "Me sinto neutro", face: "—", color: COLORS.moodNeutral },
-  { key: "bem", label: "Me sinto bem", face: "⌣", color: COLORS.moodHappy },
-  { key: "muito_bem", label: "Me sinto muito bem", face: "◠", color: COLORS.moodHappy },
+  { key: "muito_triste", label: "Me sinto muito mal", mouth: "M28 68 Q50 48 72 68", color: COLORS.moodVeryBad },
+  { key: "triste", label: "Me sinto mal", mouth: "M30 66 Q50 55 70 66", color: COLORS.moodSad },
+  { key: "neutro", label: "Me sinto neutro", mouth: "M30 62 L70 62", color: COLORS.moodNeutral },
+  { key: "bem", label: "Me sinto bem", mouth: "M30 58 Q50 76 70 58", color: COLORS.moodHappy },
+  { key: "muito_bem", label: "Me sinto muito bem", mouth: "M26 56 Q50 84 74 56", color: COLORS.moodHappy },
 ];
 
 export default function CheckinDiarioScreen({ navigation }) {
@@ -25,10 +25,15 @@ export default function CheckinDiarioScreen({ navigation }) {
 
       <View style={styles.content}>
         <Text style={styles.question}>Como você descreveria seu humor hoje?</Text>
-        <Text style={styles.selectedLabel}>{selectedMood.label}</Text>
 
-        <View style={[styles.faceCircle, { backgroundColor: selectedMood.color }]}>
-          <Text style={styles.faceEmoji}>{selectedMood.face}</Text>
+        <View style={styles.moodBlock}>
+          <Text style={styles.selectedLabel}>{selectedMood.label}</Text>
+
+          <View style={[styles.faceCircle, { backgroundColor: selectedMood.color }]}>
+            <FaceIcon mouth={selectedMood.mouth} />
+          </View>
+
+          <DoubleChevronDown />
         </View>
 
         <MoodArc selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
@@ -42,6 +47,27 @@ export default function CheckinDiarioScreen({ navigation }) {
         </TouchableOpacity>
       </View>
     </View>
+  );
+}
+
+// Rosto simples (olhos + boca) desenhado em SVG, no mesmo estilo "flat" do Figma
+function FaceIcon({ mouth, size = 62 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Rect x={27} y={32} width={11} height={23} rx={5.5} fill={COLORS.textBrown} />
+      <Rect x={62} y={32} width={11} height={23} rx={5.5} fill={COLORS.textBrown} />
+      <Path d={mouth} stroke={COLORS.textBrown} strokeWidth={7} strokeLinecap="round" fill="none" />
+    </Svg>
+  );
+}
+
+// Indicador de "arraste para escolher" — chevron duplo, como no protótipo
+function DoubleChevronDown() {
+  return (
+    <Svg width={26} height={18} viewBox="0 0 26 18">
+      <Path d="M2 2 L13 9 L24 2" stroke={COLORS.border} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <Path d="M2 9 L13 16 L24 9" stroke={COLORS.border} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </Svg>
   );
 }
 
@@ -116,16 +142,24 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   question: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "800",
     color: COLORS.textBrown,
     textAlign: "center",
-    marginBottom: 18,
+    letterSpacing: -0.3,
+    lineHeight: 33,
+    marginBottom: 32,
+  },
+  moodBlock: {
+    alignItems: "center",
+    gap: 20,
+    marginBottom: 12,
   },
   selectedLabel: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: "700",
     color: COLORS.textGray,
-    marginBottom: 24,
+    letterSpacing: -0.1,
   },
   faceCircle: {
     width: 96,
@@ -133,12 +167,6 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 28,
-  },
-  faceEmoji: {
-    fontSize: 38,
-    color: COLORS.textBrown,
-    fontWeight: "700",
   },
   arcWrapper: {
     position: "relative",

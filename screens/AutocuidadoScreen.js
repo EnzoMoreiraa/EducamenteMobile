@@ -36,15 +36,17 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   contentTitle: {
-    fontSize: 18,
-    fontWeight: "800",
+    fontSize: 17,
+    fontWeight: "900",
     color: COLORS.textBrown,
-    marginBottom: 18,
+    letterSpacing: -0.2,
+    marginBottom: 20,
   },
   contentBody: {
     fontSize: 15,
-    lineHeight: 28,
-    color: COLORS.textBrown,
-    textAlign: "center",
+    lineHeight: 29,
+    fontWeight: "300",
+    color: COLORS.black,
+    letterSpacing: -0.15,
   },
 });

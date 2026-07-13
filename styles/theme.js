@@ -7,16 +7,16 @@ export const COLORS = {
   background: "#F4F1ED",     // Fundo claro (cards, telas de conteúdo)
   cardBackground: "#FFFFFF",
   textDark: "#1F2A28",
-  textBrown: "#5C4632",       // Texto marrom usado em "Autocuidado" / "Check-in Diário"
-  textGray: "#7A7A7A",
+  textBrown: "#4F3422",       // Mindful Brown — texto usado em "Autocuidado" / "Check-in Diário"
+  textGray: "#736B66",        // Optimistic Gray/60
   placeholder: "#A0A0A0",
   white: "#FFFFFF",
   black: "#000000",
   border: "#E0DDD8",
-  moodNeutral: "#F2B33D",     // Amarelo do medidor de humor
-  moodSad: "#D9772E",         // Laranja (triste)
-  moodHappy: "#7FAF5B",       // Verde (feliz)
-  moodVeryBad: "#8B6BBF",     // Roxo (extremos do medidor)
+  moodNeutral: "#FFCE5C",     // Zen Yellow/40 — amarelo do medidor de humor
+  moodSad: "#ED7E1C",         // Empathy Orange/40 — laranja (triste)
+  moodHappy: "#9BB168",       // Serenity Green/50 — verde (feliz)
+  moodVeryBad: "#A694F5",     // Gentle Purple/40 — roxo (extremos do medidor)
 };
 
 export const FONT = {

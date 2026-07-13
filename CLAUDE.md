@@ -71,14 +71,15 @@ EducamenteMobile/          ← raiz do repositório (.git aqui)
 │   ├── chat-icon.png
 │   ├── check-icon.png
 │   ├── home-icon.png
-│   ├── meter-icon.png     ← ilustração do medidor de humor (HomeScreen)
 │   ├── profile-icon.png
 │   ├── neutral-icon.png
-│   ├── anonimous-icon.png ← ícone do canal anônimo (tela ainda não implementada)
-│   ├── identifed-icon.png ← ícone do canal identificado (tela ainda não implementada)
+│   ├── anonimous-icon.png ← ícone do canal anônimo — ainda não usado no código (ChatScreen usa placeholder.png)
+│   ├── identifed-icon.png ← ícone do canal identificado — ainda não usado no código (ChatScreen usa placeholder.png)
 │   ├── gmail-logo.png
 │   ├── apple-logo.png
-│   └── microsoft-logo.png
+│   ├── microsoft-logo.png
+│   └── images/
+│       └── placeholder.png ← placeholder neutro para imagens ainda não exportadas do Figma
 ├── screens/               ← uma tela por arquivo
 │   ├── SplashScreen.js
 │   ├── LoginScreen.js
@@ -87,10 +88,14 @@ EducamenteMobile/          ← raiz do repositório (.git aqui)
 │   ├── AutocuidadoScreen.js
 │   ├── CheckinDiarioScreen.js
 │   ├── CalendarPageScreen.js
-│   └── SchedulePageScreen.js
+│   ├── SchedulePageScreen.js
+│   ├── ChatScreen.js      ← hub "Envie uma mensagem" (RF06/RF07)
+│   ├── AnonimoScreen.js   ← canal anônimo (RF07)
+│   └── IdentificadaScreen.js ← canal identificado (RF06)
 ├── components/            ← componentes reutilizáveis
 │   ├── Headers.js         ← AuthHeader (login/register) + ScreenHeader (telas internas)
-│   └── BottomTabBar.js    ← barra de navegação inferior (Calendar, Chat, Home, Autocuidado, Profile)
+│   ├── BottomTabBar.js    ← barra flutuante de navegação inferior (Calendar, Chat, Home, Autocuidado, Profile)
+│   └── MessageComposer.js ← formulário de mensagem compartilhado por Anonimo/Identificada
 ├── navigation/
 │   └── AppNavigator.js    ← stack central de navegação
 └── styles/
@@ -108,12 +113,12 @@ EducamenteMobile/          ← raiz do repositório (.git aqui)
 | `background`    | `#F4F1ED` | Fundo geral das telas internas               |
 | `cardBackground`| `#FFFFFF` | Fundo de cards                               |
 | `textDark`      | `#1F2A28` | Texto principal                              |
-| `textBrown`     | `#5C4632` | Texto de conteúdo (Autocuidado, Check-in)    |
-| `textGray`      | `#7A7A7A` | Texto secundário, placeholders               |
-| `moodNeutral`   | `#F2B33D` | Humor neutro (medidor)                       |
-| `moodSad`       | `#D9772E` | Humor triste (medidor)                       |
-| `moodHappy`     | `#7FAF5B` | Humor feliz (medidor)                        |
-| `moodVeryBad`   | `#8B6BBF` | Humor muito ruim (extremo do medidor)        |
+| `textBrown`     | `#4F3422` | Mindful Brown — texto de conteúdo (Autocuidado, Check-in) |
+| `textGray`      | `#736B66` | Optimistic Gray/60 — texto secundário, placeholders |
+| `moodNeutral`   | `#FFCE5C` | Zen Yellow/40 — humor neutro (medidor)       |
+| `moodSad`       | `#ED7E1C` | Empathy Orange/40 — humor triste (medidor)   |
+| `moodHappy`     | `#9BB168` | Serenity Green/50 — humor feliz (medidor)    |
+| `moodVeryBad`   | `#A694F5` | Gentle Purple/40 — humor muito ruim (extremo do medidor) |
 
 ---
 
@@ -131,10 +136,14 @@ Home (bottom bar presente em todas as telas internas)
   ├── card Check-in           → CheckinDiario
   ├── card Autocuidado        → Autocuidado
   ├── bottom bar: Calendar    → CalendarPage
-  ├── bottom bar: Chat        → Chat (placeholder vazio — tela não prototipada ainda)
+  ├── bottom bar: Chat        → Chat (hub "Envie uma mensagem")
   ├── bottom bar: Home        → Home
   ├── bottom bar: ♡           → Autocuidado
   └── bottom bar: Profile     → Profile (placeholder vazio — tela não prototipada ainda)
+
+Chat (hub)
+  ├── card "Mensagem Anônima"      → Anonimo (RF07)
+  └── card "Mensagem Identificada" → Identificada (RF06)
 
 CalendarPage
   └── botão "+"               → SchedulePage (modal, slide_from_bottom)
@@ -196,19 +205,20 @@ CalendarPage
 - Toggle "Lembre-me"
 - Botão "Agendar"
 
+### ✅ ChatScreen
+- Hub "Envie uma mensagem": dois cards (Mensagem Anônima / Mensagem Identificada)
+- Ícones reais ("secret 1" / "private 1") ainda não exportados do Figma —
+  usando `assets/images/placeholder.png` (comentado no código)
+
+### ✅ AnonimoScreen / IdentificadaScreen
+- Formulário compartilhado via `components/MessageComposer.js` (RF06/RF07)
+- Campo Título (opcional), toolbar de formatação mockada (glifos de texto,
+  sem lib de rich-text real), textarea "Conte o que precisar", botão "Entrar"
+- Diferem apenas em título do header e texto do aviso de rodapé
+
 ---
 
 ## 7. Telas Pendentes (protótipo ainda não recebido)
-
-### ⏳ ChatScreen
-- Canal de comunicação direto aluno → coordenação (RF06)
-- Asset `identifed-icon.png` já disponível em `assets/`
-- Rota criada como placeholder no AppNavigator
-
-### ⏳ CanalAnonimoScreen
-- Canal anônimo de apoio e denúncia (RF07)
-- Asset `anonimous-icon.png` já disponível em `assets/`
-- Não tem rota criada ainda (espera protótipo)
 
 ### ⏳ ProfileScreen
 - Perfil do usuário (aluno ou educador)
@@ -233,8 +243,8 @@ CalendarPage
 | RF03 | Check-in emocional diário (escala de sentimentos)           | ✅ Front pronto |
 | RF04 | Histórico e monitoramento emocional (gráficos)              | ⏳ Não iniciado |
 | RF05 | Conteúdos educativos (textos, dicas)                        | ✅ Front pronto (dados mockados) |
-| RF06 | Canal de comunicação seguro aluno → coordenação             | ⏳ Protótipo pendente |
-| RF07 | Canal anônimo de apoio e denúncia                           | ⏳ Protótipo pendente |
+| RF06 | Canal de comunicação seguro aluno → coordenação             | ✅ Front pronto (dados mockados) |
+| RF07 | Canal anônimo de apoio e denúncia                           | ✅ Front pronto (dados mockados) |
 | RF08 | Agendamento de atendimentos com coordenação/orientadores    | ✅ Front pronto (dados mockados) |
 | RF09 | Notificações e lembretes automáticos                        | ⏳ Não iniciado |
 
@@ -297,8 +307,7 @@ CalendarPage
 - [x] Navegação Stack completa
 - [x] Componentes reutilizáveis (Headers, BottomTabBar)
 - [x] Tema global (theme.js)
-- [ ] Chat (canal identificado) — aguarda protótipo Figma
-- [ ] Canal anônimo — aguarda protótipo Figma
+- [x] Chat (hub "Envie uma mensagem") + canal anônimo + canal identificado
 - [ ] Perfil do usuário — aguarda protótipo Figma
 - [ ] Histórico de check-ins com gráficos
 - [ ] Notificações
@@ -355,3 +364,56 @@ CalendarPage
 6. **react-native-svg** é necessário para o `CheckinDiarioScreen` (arco do medidor).
    Se der erro de "Unable to resolve react-native-svg", rodar:
    `npx expo install react-native-svg -- --legacy-peer-deps`
+
+# EducaMente — Status Atualizado (sessões de refinamento via Figma)
+
+> Gerado após análise do arquivo Figma oficial do projeto
+> (`Educamente - Mobile`, node-id 70-361) e implementação/refinamento de
+> todas as telas com frame pronto no Figma.
+
+---
+
+## 1. O que foi feito
+
+**Sessão 1** — refinamento de fidelidade das 3 primeiras telas com base no Figma:
+`Splashscreen` (70:372), `RegisterScreen` (140:522), `LoginScreen` (140:462).
+Ajustes de tipografia, distribuição vertical da Splash e tamanho/raio do
+botão de voltar (`AuthHeader`). Criado `assets/images/placeholder.png`
+(PNG 1x1px cinza-claro) como asset neutro para imagens ainda não exportadas.
+
+**Sessão 2** — refinamento de fidelidade de `HomePage` (150:653),
+`Check-in Diário` (150:621) e `Autocuidado` (150:703): paleta de humor e
+`textBrown`/`textGray` atualizados para os tokens exatos do Figma, rosto do
+Check-in redesenhado em SVG (antes usava emoji), `ScreenHeader` com botão de
+voltar maior, `BottomTabBar` convertida para pílula flutuante com estado
+ativo em contorno, `HomeScreen` com prévia em mini-arco do humor e carrossel
+de Autocuidado com cards "peek".
+
+**Sessão 3** — implementação das 3 telas que ainda não existiam no código:
+`Envie uma mensagem` (177:2951, hub `ChatScreen`), `Anônimo` (177:2966,
+`AnonimoScreen`, RF07) e `Identificada` (177:3006, `IdentificadaScreen`,
+RF06). Os dois formulários de mensagem compartilham
+`components/MessageComposer.js`. Ícones ilustrados ("secret 1" / "private 1")
+ainda não exportados do Figma — usando `assets/images/placeholder.png`
+(comentado no código, apontando qual asset real deve entrar ali).
+
+Todas as telas com frame no Figma até agora estão implementadas. Restam
+apenas telas sem frame ainda (Perfil, Histórico de Check-ins, Notificações).
+
+## 2. Arquivos-chave desta última leva (Sessão 3)
+
+| Arquivo | Tipo | Descrição |
+|---|---|---|
+| `screens/ChatScreen.js` | Criado | Hub com os dois cards de entrada do canal de mensagem |
+| `screens/AnonimoScreen.js` | Criado | Configura o `MessageComposer` para o canal anônimo (RF07) |
+| `screens/IdentificadaScreen.js` | Criado | Configura o `MessageComposer` para o canal identificado (RF06) |
+| `components/MessageComposer.js` | Criado | Formulário compartilhado (título, toolbar mockada, textarea, botão) |
+| `navigation/AppNavigator.js` | Modificado | Rotas `Chat`/`Anonimo`/`Identificada` substituindo o placeholder de Chat |
+
+## 3. Verificação
+
+`npx expo start --web` + navegação real via Playwright (headless Chromium)
+confirmaram que todas as telas novas/refinadas renderizam sem erros de
+console, cobrindo Home, Check-in, Autocuidado, Chat, Anônimo, Identificada
+e Calendário (para garantir que o `ScreenHeader`/`BottomTabBar`
+compartilhados não quebraram telas existentes).

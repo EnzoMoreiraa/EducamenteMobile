@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
-import { COLORS } from "../styles/theme";
+import { COLORS, SIZES } from "../styles/theme";
 
 // Header verde usado em telas de autenticação (Login/Register)
 export function AuthHeader({ onBack }) {
@@ -30,10 +30,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    width: 46,
+    height: 46,
+    borderRadius: SIZES.radiusSmall,
+    backgroundColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -45,28 +45,29 @@ const styles = StyleSheet.create({
   screenHeaderContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 12,
+    paddingHorizontal: 20,
+    paddingTop: 16,
     paddingBottom: 8,
+    gap: 14,
   },
   circleBackButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 1.5,
+    width: 48,
+    height: 48,
+    borderRadius: SIZES.radiusPill,
+    borderWidth: 1.2,
     borderColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
   },
   circleBackArrow: {
-    fontSize: 20,
+    fontSize: 22,
     color: COLORS.primary,
     fontWeight: "700",
   },
   screenHeaderTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
     color: COLORS.primary,
+    letterSpacing: -0.2,
   },
 });

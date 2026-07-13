@@ -1,6 +1,16 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import BottomTabBar from "../components/BottomTabBar";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
+
+// Conteúdo de exemplo — virá da entidade "Conteúdos_educativos" do back-end
+const ARTICLES = [
+  {
+    id: "1",
+    title: "O Poder do Autogerenciamento Emocional",
+    color: COLORS.primary,
+  },
+];
 
 export default function HomeScreen({ navigation }) {
   // Nome do usuário viria do estado de autenticação/contexto futuramente
@@ -31,11 +41,7 @@ export default function HomeScreen({ navigation }) {
           activeOpacity={0.85}
           onPress={() => navigation.navigate("CheckinDiario")}
         >
-          <Image
-            source={require("../assets/meter-icon.png")}
-            style={styles.meterImage}
-            resizeMode="contain"
-          />
+          <MiniMoodArc />
           <Text style={styles.checkinCardText}>
             Registre e acompanhe como você está se sentindo
           </Text>
@@ -44,27 +50,75 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>Autocuidado</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={styles.autocuidadoCard}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate("Autocuidado")}
-          >
-            <View style={styles.autocuidadoBadge}>
-              <Image
-                source={require("../assets/check-icon.png")}
-                style={styles.autocuidadoBadgeIcon}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.autocuidadoCardLabel}>
-              O Poder do Autogerenciamento Emocional
-            </Text>
-          </TouchableOpacity>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.autocuidadoScroll}>
+          {/* Cards "peek" nas pontas — imagens reais do Figma ainda não exportadas, usando placeholder */}
+          <Image
+            source={require("../assets/images/placeholder.png")}
+            style={styles.peekCard}
+            resizeMode="cover"
+          />
+          {ARTICLES.map((article) => (
+            <TouchableOpacity
+              key={article.id}
+              style={[styles.autocuidadoCard, { backgroundColor: article.color }]}
+              activeOpacity={0.85}
+              onPress={() => navigation.navigate("Autocuidado")}
+            >
+              <View style={styles.autocuidadoBadge}>
+                <Image
+                  source={require("../assets/check-icon.png")}
+                  style={styles.autocuidadoBadgeIcon}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.autocuidadoCardLabel}>{article.title}</Text>
+            </TouchableOpacity>
+          ))}
+          <Image
+            source={require("../assets/images/placeholder.png")}
+            style={styles.peekCard}
+            resizeMode="cover"
+          />
         </ScrollView>
       </ScrollView>
 
       <BottomTabBar navigation={navigation} active="Home" />
+    </View>
+  );
+}
+
+// Prévia em miniatura do arco de humor (Check-in), estático, só ilustrativo
+function MiniMoodArc() {
+  const width = 220;
+  const height = 76;
+  const cx = width / 2;
+  const cy = height;
+  const radius = 100;
+
+  const segmentColors = [COLORS.moodSad, COLORS.moodNeutral, COLORS.moodHappy];
+
+  const segments = segmentColors.map((color, index) => {
+    const startAngle = Math.PI - (index / segmentColors.length) * Math.PI;
+    const endAngle = Math.PI - ((index + 1) / segmentColors.length) * Math.PI;
+
+    const x1 = cx + radius * Math.cos(startAngle);
+    const y1 = cy - radius * Math.sin(startAngle);
+    const x2 = cx + radius * Math.cos(endAngle);
+    const y2 = cy - radius * Math.sin(endAngle);
+
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 0 0 ${x2} ${y2} Z`;
+
+    return { path, color, index };
+  });
+
+  return (
+    <View style={styles.miniArcWrapper}>
+      <Svg width={width} height={height + 6}>
+        {segments.map((seg) => (
+          <Path key={seg.index} d={seg.path} fill={seg.color} />
+        ))}
+      </Svg>
+      <View style={styles.miniArcDot} />
     </View>
   );
 }
@@ -89,9 +143,10 @@ const styles = StyleSheet.create({
     color: COLORS.textGray,
   },
   userName: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: "800",
     color: COLORS.accent,
+    letterSpacing: -0.3,
   },
   subGreeting: {
     fontSize: 13,
@@ -99,9 +154,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
@@ -109,7 +164,7 @@ const styles = StyleSheet.create({
   avatarLetter: {
     color: COLORS.white,
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 17,
   },
   divider: {
     height: 1,
@@ -117,33 +172,57 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: "800",
     color: COLORS.textDark,
-    marginBottom: 14,
+    textAlign: "center",
+    letterSpacing: -0.4,
+    marginBottom: 16,
   },
   checkinCard: {
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: SIZES.radiusMedium,
-    padding: 20,
+    backgroundColor: "rgba(255,255,255,0.6)",
+    borderRadius: SIZES.radiusLarge,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     alignItems: "center",
     ...SHADOW,
   },
-  meterImage: {
-    width: 160,
-    height: 90,
-    marginBottom: 12,
+  miniArcWrapper: {
+    position: "relative",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  miniArcDot: {
+    position: "absolute",
+    bottom: -3,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: COLORS.textBrown,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.6)",
   },
   checkinCardText: {
-    fontSize: 14,
-    color: COLORS.textGray,
+    fontSize: 13,
+    color: COLORS.black,
     textAlign: "center",
   },
-  autocuidadoCard: {
-    width: 150,
-    backgroundColor: COLORS.cardBackground,
+  autocuidadoScroll: {
+    overflow: "visible",
+  },
+  peekCard: {
+    width: 40,
+    height: 160,
     borderRadius: SIZES.radiusMedium,
-    padding: 14,
+    marginRight: 14,
+    opacity: 0.5,
+  },
+  autocuidadoCard: {
+    width: 260,
+    height: 160,
+    borderRadius: SIZES.radiusMedium,
+    padding: 16,
+    justifyContent: "space-between",
     marginRight: 14,
     ...SHADOW,
   },
@@ -151,10 +230,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: "rgba(255,255,255,0.25)",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
   },
   autocuidadoBadgeIcon: {
     width: 16,
@@ -162,8 +240,9 @@ const styles = StyleSheet.create({
     tintColor: COLORS.white,
   },
   autocuidadoCardLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.textDark,
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.white,
+    letterSpacing: -0.2,
   },
 });

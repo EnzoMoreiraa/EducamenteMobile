@@ -115,17 +115,18 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: SIZES.radiusLarge,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "800",
     color: COLORS.white,
     paddingHorizontal: SIZES.paddingScreen,
-    marginTop: 16,
+    marginTop: 20,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: "rgba(255,255,255,0.85)",
     paddingHorizontal: SIZES.paddingScreen,
     marginTop: 6,
+    lineHeight: 20,
   },
   formContainer: {
     paddingHorizontal: SIZES.paddingScreen,

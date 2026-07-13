@@ -8,32 +8,36 @@ export default function SplashScreen({ navigation }) {
 
       <Text style={styles.title}>EducaMente</Text>
 
-      <Image
-        source={require("../assets/educamente-logo.gif")}
-        style={styles.mainLogo}
-        resizeMode="contain"
-      />
+      <View style={styles.middleSection}>
+        <Image
+          source={require("../assets/educamente-logo.gif")}
+          style={styles.mainLogo}
+          resizeMode="contain"
+        />
 
-      <View style={styles.sloganContainer}>
-        <Text style={styles.sloganYellow}>Mentes Saudáveis</Text>
-        <Text style={styles.sloganWhite}>Futuro Brilhante</Text>
+        <View style={styles.sloganContainer}>
+          <Text style={styles.sloganYellow}>Mentes Saudáveis</Text>
+          <Text style={styles.sloganWhite}>Futuro Brilhante</Text>
+        </View>
       </View>
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.button}
-        onPress={() => navigation.navigate("Login", { role: "aluno" })}
-      >
-        <Text style={styles.buttonText}>Sou aluno</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsSection}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.button}
+          onPress={() => navigation.navigate("Login", { role: "aluno" })}
+        >
+          <Text style={styles.buttonText}>Sou aluno</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={styles.button}
-        onPress={() => navigation.navigate("Login", { role: "educador" })}
-      >
-        <Text style={styles.buttonText}>Sou Educador</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.button}
+          onPress={() => navigation.navigate("Login", { role: "educador" })}
+        >
+          <Text style={styles.buttonText}>Sou Educador</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -43,33 +47,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.primary,
     alignItems: "center",
-    justifyContent: "center",
     paddingHorizontal: SIZES.paddingScreen,
+    paddingTop: 64,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "800",
     color: COLORS.white,
-    marginBottom: 24,
+    textAlign: "center",
+  },
+  middleSection: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   mainLogo: {
-    width: 150,
-    height: 150,
+    width: 180,
+    height: 180,
     marginBottom: 32,
   },
   sloganContainer: {
     alignItems: "center",
-    marginBottom: 48,
   },
   sloganYellow: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     color: COLORS.accent,
+    textAlign: "center",
   },
   sloganWhite: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: "800",
     color: COLORS.white,
+    textAlign: "center",
+  },
+  buttonsSection: {
+    width: "100%",
   },
   button: {
     backgroundColor: COLORS.accent,
