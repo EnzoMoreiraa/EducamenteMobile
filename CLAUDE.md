@@ -66,20 +66,31 @@ EducamenteMobile/          ← raiz do repositório (.git aqui)
 ├── assets/                ← todos os assets de imagem/ícone
 │   ├── educamente-logo.gif
 │   ├── icon.png           ← ícone do app (gerado de frame do gif, fundo verde #007D6E)
-│   ├── back-icon.png
+│   ├── back-icon.png      ← usado no AuthHeader (Login/Register)
+│   ├── backButton.png     ← usado no ScreenHeader (Autocuidado, Check-in, Calendar, Chat, Anonimo, Identificada)
 │   ├── calendar-icon.png
 │   ├── chat-icon.png
 │   ├── check-icon.png
 │   ├── home-icon.png
 │   ├── profile-icon.png
-│   ├── neutral-icon.png
-│   ├── anonimous-icon.png ← ícone do canal anônimo — ainda não usado no código (ChatScreen usa placeholder.png)
-│   ├── identifed-icon.png ← ícone do canal identificado — ainda não usado no código (ChatScreen usa placeholder.png)
 │   ├── gmail-logo.png
 │   ├── apple-logo.png
 │   ├── microsoft-logo.png
+│   ├── homePageAssets/    ← assets da HomeScreen
+│   │   ├── checkinIcon.png      ← mini-arco de humor no card de Check-in
+│   │   └── autocuidadoCover.png ← capa dos cards do carrossel de Autocuidado
+│   ├── checkinAssets/     ← assets da CheckinDiarioScreen (ainda não integrados ao código)
+│   │   ├── meter-icon.png       ← arco de humor completo (alta fidelidade)
+│   │   └── neutral-icon.png     ← rosto do estado "neutro"
+│   ├── chatAssets/        ← pasta reservada para assets de Anonimo/Identificada (vazia por ora)
 │   └── images/
-│       └── placeholder.png ← placeholder neutro para imagens ainda não exportadas do Figma
+│       ├── placeholder.png    ← placeholder neutro para imagens ainda não exportadas do Figma
+│       ├── anonimous-icon.png ← ícone "Mensagem Anônima" no hub ChatScreen
+│       ├── identifed-icon.png ← ícone "Mensagem Identificada" no hub ChatScreen
+│       └── textEdit/          ← ícones da toolbar de formatação do MessageComposer
+│           ├── pencilEdit.png, caps.png, markText.png, bold.png, italic.png,
+│           │   underline.png, strikethrough.png, addLink.png, addImage.png,
+│           │   listNum.png, listPoint.png, textLeft.png, textCenter.png, textRight.png
 ├── screens/               ← uma tela por arquivo
 │   ├── SplashScreen.js
 │   ├── LoginScreen.js
@@ -91,11 +102,16 @@ EducamenteMobile/          ← raiz do repositório (.git aqui)
 │   ├── SchedulePageScreen.js
 │   ├── ChatScreen.js      ← hub "Envie uma mensagem" (RF06/RF07)
 │   ├── AnonimoScreen.js   ← canal anônimo (RF07)
-│   └── IdentificadaScreen.js ← canal identificado (RF06)
+│   ├── IdentificadaScreen.js ← canal identificado (RF06)
+│   ├── ProfileScreen.js   ← hub de perfil (resumo do usuário + menu)
+│   ├── EditProfileScreen.js  ← editar dados + excluir conta (abre ConfirmModal)
+│   ├── CheckinHistoryScreen.js ← histórico de respostas do check-in (RF04, mockado)
+│   └── NotificationsScreen.js ← preferências de notificação (RF09, mockado)
 ├── components/            ← componentes reutilizáveis
 │   ├── Headers.js         ← AuthHeader (login/register) + ScreenHeader (telas internas)
 │   ├── BottomTabBar.js    ← barra flutuante de navegação inferior (Calendar, Chat, Home, Autocuidado, Profile)
-│   └── MessageComposer.js ← formulário de mensagem compartilhado por Anonimo/Identificada
+│   ├── MessageComposer.js ← formulário de mensagem compartilhado por Anonimo/Identificada
+│   └── ConfirmModal.js    ← modal de confirmação genérico (usado hoje para excluir conta)
 ├── navigation/
 │   └── AppNavigator.js    ← stack central de navegação
 └── styles/
@@ -207,30 +223,42 @@ CalendarPage
 
 ### ✅ ChatScreen
 - Hub "Envie uma mensagem": dois cards (Mensagem Anônima / Mensagem Identificada)
-- Ícones reais ("secret 1" / "private 1") ainda não exportados do Figma —
-  usando `assets/images/placeholder.png` (comentado no código)
+- Ícones reais: `assets/images/anonimous-icon.png` / `identifed-icon.png`
 
 ### ✅ AnonimoScreen / IdentificadaScreen
 - Formulário compartilhado via `components/MessageComposer.js` (RF06/RF07)
-- Campo Título (opcional), toolbar de formatação mockada (glifos de texto,
-  sem lib de rich-text real), textarea "Conte o que precisar", botão "Entrar"
+- Campo Título (opcional), toolbar de formatação com ícones reais
+  (`assets/images/textEdit/`), textarea "Conte o que precisar", botão "Entrar"
 - Diferem apenas em título do header e texto do aviso de rodapé
+
+### ✅ ProfileScreen
+- Hub de perfil: card-resumo (avatar, nome, e-mail, badge de papel) + menu
+  ("Editar perfil", "Histórico de Check-in", "Notificações") + "Sair da conta"
+- Sem frame no Figma ainda — segue a estética "shadow box" (cards brancos
+  com sombra sobre o fundo bege) já usada no resto do app
+- Front-end apenas; dados mockados até o CRUD de usuários chegar do back-end
+
+### ✅ EditProfileScreen
+- Formulário (Nome, Sobrenome, E-mail) + botão "Salvar alterações" (mockado)
+- Cartão de perigo "Excluir conta" → abre `components/ConfirmModal.js`
+  (variante destrutiva) antes de confirmar a exclusão
+
+### ✅ CheckinHistoryScreen
+- Lista de check-ins passados (data + humor), dados mockados (RF04)
+- Futuramente virá da entidade `Checkin_Emocional`; hoje é só a escala de
+  humor, depois vira um questionário completo
+
+### ✅ NotificationsScreen
+- Lista de preferências com `Switch` (lembrete de check-in, mensagens,
+  agendamentos, novos conteúdos), estado local mockado (RF09)
 
 ---
 
 ## 7. Telas Pendentes (protótipo ainda não recebido)
 
-### ⏳ ProfileScreen
-- Perfil do usuário (aluno ou educador)
-- Rota criada como placeholder no AppNavigator
-
-### ⏳ HistoricoCheckinScreen
-- Histórico visual com gráficos de humor (RF04)
-- Não tem rota criada ainda
-
-### ⏳ NotificacoesScreen
-- Notificações e lembretes (RF09)
-- Não tem rota criada ainda
+Nenhuma tela core pendente no momento — restam apenas refinamentos futuros
+(gráficos no histórico de check-in, notificações push reais, integração
+com back-end).
 
 ---
 
@@ -241,12 +269,12 @@ CalendarPage
 | RF01 | Cadastro de usuário (nome, e-mail, ano escolar, faixa etária) | ✅ Front pronto |
 | RF02 | Login e autenticação por e-mail/senha com perfis distintos  | ✅ Front pronto (back pendente) |
 | RF03 | Check-in emocional diário (escala de sentimentos)           | ✅ Front pronto |
-| RF04 | Histórico e monitoramento emocional (gráficos)              | ⏳ Não iniciado |
+| RF04 | Histórico e monitoramento emocional (gráficos)              | ✅ Front pronto (lista mockada, sem gráficos ainda) |
 | RF05 | Conteúdos educativos (textos, dicas)                        | ✅ Front pronto (dados mockados) |
 | RF06 | Canal de comunicação seguro aluno → coordenação             | ✅ Front pronto (dados mockados) |
 | RF07 | Canal anônimo de apoio e denúncia                           | ✅ Front pronto (dados mockados) |
 | RF08 | Agendamento de atendimentos com coordenação/orientadores    | ✅ Front pronto (dados mockados) |
-| RF09 | Notificações e lembretes automáticos                        | ⏳ Não iniciado |
+| RF09 | Notificações e lembretes automáticos                        | ✅ Front pronto (preferências mockadas, sem push real) |
 
 ---
 
@@ -308,14 +336,14 @@ CalendarPage
 - [x] Componentes reutilizáveis (Headers, BottomTabBar)
 - [x] Tema global (theme.js)
 - [x] Chat (hub "Envie uma mensagem") + canal anônimo + canal identificado
-- [ ] Perfil do usuário — aguarda protótipo Figma
-- [ ] Histórico de check-ins com gráficos
-- [ ] Notificações
+- [x] Perfil (hub, editar perfil + excluir conta, histórico de check-in, notificações)
+- [ ] Gráficos no histórico de check-in (hoje é só uma lista)
 
 ### Fase 2 — Back-end (Node.js + MySQL)
 - [ ] Configuração do servidor Node.js
 - [ ] Modelagem e criação do banco MySQL (baseado no Diagrama ER)
 - [ ] Sistema de autenticação (login/cadastro com JWT ou sessão)
+- [ ] CRUD de usuários (Alunos/Pedagogo) — alimenta ProfileScreen/EditProfileScreen
 - [ ] API de check-ins (POST para registrar, GET para histórico)
 - [ ] API de agendamentos (CRUD)
 - [ ] API de conteúdos educativos (GET listagem)
@@ -393,27 +421,56 @@ de Autocuidado com cards "peek".
 `Envie uma mensagem` (177:2951, hub `ChatScreen`), `Anônimo` (177:2966,
 `AnonimoScreen`, RF07) e `Identificada` (177:3006, `IdentificadaScreen`,
 RF06). Os dois formulários de mensagem compartilham
-`components/MessageComposer.js`. Ícones ilustrados ("secret 1" / "private 1")
-ainda não exportados do Figma — usando `assets/images/placeholder.png`
-(comentado no código, apontando qual asset real deve entrar ali).
+`components/MessageComposer.js`. Nessa sessão os ícones ainda não tinham
+sido exportados do Figma, então usavam `assets/images/placeholder.png`.
 
-Todas as telas com frame no Figma até agora estão implementadas. Restam
-apenas telas sem frame ainda (Perfil, Histórico de Check-ins, Notificações).
+**Sessão 4** — usuário adicionou assets reais (`assets/backButton.png` e
+`assets/textEdit/*`). `ScreenHeader` passou a usar o ícone real de voltar
+(antes era um chevron de texto) e `MessageComposer` trocou os glifos de
+texto da toolbar pelos ícones reais (negrito, itálico, sublinhado, listas,
+alinhamento, anexos).
 
-## 2. Arquivos-chave desta última leva (Sessão 3)
+**Sessão 5** — usuário reorganizou os assets em subpastas
+(`homePageAssets/`, `checkinAssets/`, `chatAssets/`, e moveu alguns para
+`images/`). `MessageComposer` teve os `require()` corrigidos para o novo
+caminho de `textEdit/`. `ChatScreen` passou a usar os ícones reais
+`anonimous-icon.png`/`identifed-icon.png` (que já existiam no projeto e
+batiam exatamente com os ícones "secret 1"/"private 1" do Figma).
+`HomeScreen`: o mini-arco de humor (SVG) foi trocado pelo asset real
+`checkinIcon.png`; o carrossel de Autocuidado foi reconstruído como um
+carrossel infinito (índice central + vizinhos via módulo, sem lib externa)
+usando `autocuidadoCover.png` como capa, com o card central em destaque e
+os vizinhos menores/translúcidos. `assets/checkinAssets/` (arco completo +
+rosto "neutro") ainda não foi integrado ao `CheckinDiarioScreen` —herdaria
+uma decisão de design (manter a seleção de humor interativa via SVG, ou
+sobrepor áreas de toque num asset estático) que não foi pedida ainda.
+
+**Sessão 6** — feature de Perfil implementada do zero (sem frame no Figma
+ainda), seguindo a estética "shadow box" (cards brancos com sombra sobre o
+fundo bege) já usada no resto do app: `ProfileScreen` (hub com resumo do
+usuário + menu), `EditProfileScreen` (formulário + exclusão de conta via
+`components/ConfirmModal.js`, um modal de confirmação genérico e
+reutilizável), `CheckinHistoryScreen` (lista mockada, RF04) e
+`NotificationsScreen` (preferências com `Switch`, RF09). É front-end puro,
+preparado para receber o CRUD de usuários do back-end depois.
+
+## 2. Arquivos-chave da Sessão 6 (Perfil)
 
 | Arquivo | Tipo | Descrição |
 |---|---|---|
-| `screens/ChatScreen.js` | Criado | Hub com os dois cards de entrada do canal de mensagem |
-| `screens/AnonimoScreen.js` | Criado | Configura o `MessageComposer` para o canal anônimo (RF07) |
-| `screens/IdentificadaScreen.js` | Criado | Configura o `MessageComposer` para o canal identificado (RF06) |
-| `components/MessageComposer.js` | Criado | Formulário compartilhado (título, toolbar mockada, textarea, botão) |
-| `navigation/AppNavigator.js` | Modificado | Rotas `Chat`/`Anonimo`/`Identificada` substituindo o placeholder de Chat |
+| `screens/ProfileScreen.js` | Criado | Hub: card-resumo do usuário + menu (Editar perfil, Histórico, Notificações) + Sair |
+| `screens/EditProfileScreen.js` | Criado | Formulário de edição + card de exclusão de conta |
+| `screens/CheckinHistoryScreen.js` | Criado | Lista mockada do histórico de check-ins (RF04) |
+| `screens/NotificationsScreen.js` | Criado | Lista de preferências com `Switch` (RF09) |
+| `components/ConfirmModal.js` | Criado | Modal de confirmação genérico, com variante destrutiva |
+| `navigation/AppNavigator.js` | Modificado | Rotas `Profile`/`EditProfile`/`CheckinHistory`/`Notifications` substituindo o placeholder de Profile |
 
 ## 3. Verificação
 
 `npx expo start --web` + navegação real via Playwright (headless Chromium)
 confirmaram que todas as telas novas/refinadas renderizam sem erros de
-console, cobrindo Home, Check-in, Autocuidado, Chat, Anônimo, Identificada
-e Calendário (para garantir que o `ScreenHeader`/`BottomTabBar`
-compartilhados não quebraram telas existentes).
+console — incluindo o fluxo completo do Perfil (hub → editar → abrir/cancelar
+o modal de exclusão → histórico → notificações com toggle funcional) e uma
+passada pelas telas existentes (Home, Check-in, Autocuidado, Chat, Anônimo,
+Identificada, Calendário) para garantir que os componentes compartilhados
+(`ScreenHeader`, `BottomTabBar`) não regrediram nada.

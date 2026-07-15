@@ -1,20 +1,32 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, LayoutAnimation, UIManager, Platform } from "react-native";
 import BottomTabBar from "../components/BottomTabBar";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
 
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 // Conteúdo de exemplo — virá da entidade "Conteúdos_educativos" do back-end
 const ARTICLES = [
-  {
-    id: "1",
-    title: "O Poder do Autogerenciamento Emocional",
-    color: COLORS.primary,
-  },
+  { id: "1", title: "O Poder do Autogerenciamento Emocional" },
+  { id: "2", title: "Respiração Consciente para Reduzir a Ansiedade" },
+  { id: "3", title: "Construindo Rotinas de Autocuidado" },
 ];
 
 export default function HomeScreen({ navigation }) {
   // Nome do usuário viria do estado de autenticação/contexto futuramente
   const userName = "Enzo Moreira";
+  const [centerIndex, setCenterIndex] = useState(0);
+
+  const shiftCarousel = (direction) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCenterIndex((current) => (current + direction + ARTICLES.length) % ARTICLES.length);
+  };
+
+  const prevArticle = ARTICLES[(centerIndex - 1 + ARTICLES.length) % ARTICLES.length];
+  const centerArticle = ARTICLES[centerIndex];
+  const nextArticle = ARTICLES[(centerIndex + 1) % ARTICLES.length];
 
   return (
     <View style={styles.container}>
@@ -41,7 +53,11 @@ export default function HomeScreen({ navigation }) {
           activeOpacity={0.85}
           onPress={() => navigation.navigate("CheckinDiario")}
         >
-          <MiniMoodArc />
+          <Image
+            source={require("../assets/homePageAssets/checkinIcon.png")}
+            style={styles.checkinIcon}
+            resizeMode="contain"
+          />
           <Text style={styles.checkinCardText}>
             Registre e acompanhe como você está se sentindo
           </Text>
@@ -50,36 +66,23 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>Autocuidado</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.autocuidadoScroll}>
-          {/* Cards "peek" nas pontas — imagens reais do Figma ainda não exportadas, usando placeholder */}
-          <Image
-            source={require("../assets/images/placeholder.png")}
-            style={styles.peekCard}
-            resizeMode="cover"
+        <View style={styles.carousel}>
+          <ArticleCard
+            article={prevArticle}
+            variant="side"
+            onPress={() => shiftCarousel(-1)}
           />
-          {ARTICLES.map((article) => (
-            <TouchableOpacity
-              key={article.id}
-              style={[styles.autocuidadoCard, { backgroundColor: article.color }]}
-              activeOpacity={0.85}
-              onPress={() => navigation.navigate("Autocuidado")}
-            >
-              <View style={styles.autocuidadoBadge}>
-                <Image
-                  source={require("../assets/check-icon.png")}
-                  style={styles.autocuidadoBadgeIcon}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.autocuidadoCardLabel}>{article.title}</Text>
-            </TouchableOpacity>
-          ))}
-          <Image
-            source={require("../assets/images/placeholder.png")}
-            style={styles.peekCard}
-            resizeMode="cover"
+          <ArticleCard
+            article={centerArticle}
+            variant="center"
+            onPress={() => navigation.navigate("Autocuidado")}
           />
-        </ScrollView>
+          <ArticleCard
+            article={nextArticle}
+            variant="side"
+            onPress={() => shiftCarousel(1)}
+          />
+        </View>
       </ScrollView>
 
       <BottomTabBar navigation={navigation} active="Home" />
@@ -87,39 +90,27 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// Prévia em miniatura do arco de humor (Check-in), estático, só ilustrativo
-function MiniMoodArc() {
-  const width = 220;
-  const height = 76;
-  const cx = width / 2;
-  const cy = height;
-  const radius = 100;
-
-  const segmentColors = [COLORS.moodSad, COLORS.moodNeutral, COLORS.moodHappy];
-
-  const segments = segmentColors.map((color, index) => {
-    const startAngle = Math.PI - (index / segmentColors.length) * Math.PI;
-    const endAngle = Math.PI - ((index + 1) / segmentColors.length) * Math.PI;
-
-    const x1 = cx + radius * Math.cos(startAngle);
-    const y1 = cy - radius * Math.sin(startAngle);
-    const x2 = cx + radius * Math.cos(endAngle);
-    const y2 = cy - radius * Math.sin(endAngle);
-
-    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 0 0 ${x2} ${y2} Z`;
-
-    return { path, color, index };
-  });
-
+// Card de artigo do carrossel infinito — o card central fica em destaque
+// (maior, opaco); os vizinhos (esquerda/direita) ficam menores e translúcidos
+function ArticleCard({ article, variant, onPress }) {
+  const isCenter = variant === "center";
   return (
-    <View style={styles.miniArcWrapper}>
-      <Svg width={width} height={height + 6}>
-        {segments.map((seg) => (
-          <Path key={seg.index} d={seg.path} fill={seg.color} />
-        ))}
-      </Svg>
-      <View style={styles.miniArcDot} />
-    </View>
+    <TouchableOpacity
+      style={[styles.articleCard, isCenter ? styles.articleCardCenter : styles.articleCardSide]}
+      activeOpacity={0.85}
+      onPress={onPress}
+    >
+      <Image
+        source={require("../assets/homePageAssets/autocuidadoCover.png")}
+        style={styles.articleCover}
+        resizeMode="cover"
+      />
+      {isCenter && (
+        <View style={styles.articleScrim}>
+          <Text style={styles.articleTitle} numberOfLines={2}>{article.title}</Text>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 }
 
@@ -182,65 +173,57 @@ const styles = StyleSheet.create({
   checkinCard: {
     backgroundColor: "rgba(255,255,255,0.6)",
     borderRadius: SIZES.radiusLarge,
-    paddingVertical: 24,
+    paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: "center",
     ...SHADOW,
   },
-  miniArcWrapper: {
-    position: "relative",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-  miniArcDot: {
-    position: "absolute",
-    bottom: -3,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: COLORS.textBrown,
-    borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.6)",
+  checkinIcon: {
+    width: 200,
+    height: 90,
+    marginBottom: 10,
   },
   checkinCardText: {
     fontSize: 13,
     color: COLORS.black,
     textAlign: "center",
   },
-  autocuidadoScroll: {
-    overflow: "visible",
-  },
-  peekCard: {
-    width: 40,
-    height: 160,
-    borderRadius: SIZES.radiusMedium,
-    marginRight: 14,
-    opacity: 0.5,
-  },
-  autocuidadoCard: {
-    width: 260,
-    height: 160,
-    borderRadius: SIZES.radiusMedium,
-    padding: 16,
-    justifyContent: "space-between",
-    marginRight: 14,
-    ...SHADOW,
-  },
-  autocuidadoBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.25)",
+  carousel: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
-  autocuidadoBadgeIcon: {
-    width: 16,
-    height: 16,
-    tintColor: COLORS.white,
+  articleCard: {
+    borderRadius: SIZES.radiusMedium,
+    overflow: "hidden",
+    ...SHADOW,
   },
-  autocuidadoCardLabel: {
-    fontSize: 18,
+  articleCardCenter: {
+    width: 220,
+    height: 170,
+    zIndex: 2,
+  },
+  articleCardSide: {
+    width: 64,
+    height: 130,
+    opacity: 0.45,
+    marginHorizontal: -14,
+  },
+  articleCover: {
+    width: "100%",
+    height: "100%",
+  },
+  articleScrim: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  articleTitle: {
+    fontSize: 15,
     fontWeight: "700",
     color: COLORS.white,
     letterSpacing: -0.2,

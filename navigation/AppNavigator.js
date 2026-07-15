@@ -12,6 +12,10 @@ import SchedulePageScreen from "../screens/SchedulePageScreen";
 import ChatScreen from "../screens/ChatScreen";
 import AnonimoScreen from "../screens/AnonimoScreen";
 import IdentificadaScreen from "../screens/IdentificadaScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
+import CheckinHistoryScreen from "../screens/CheckinHistoryScreen";
+import NotificationsScreen from "../screens/NotificationsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,9 +24,11 @@ const Stack = createNativeStackNavigator();
 // Calendar -> SchedulePage (modal "+")
 // Home (card Check-in) -> CheckinDiario
 // Chat (hub "Envie uma mensagem") -> Anonimo (RF07) | Identificada (RF06)
+// Profile -> EditProfile | CheckinHistory | Notifications
 //
-// Profile ainda não tem protótipo enviado — placeholder para a bottom bar
-// não quebrar a navegação. Substituir quando a tela chegar.
+// Profile ainda não tem protótipo no Figma — telas construídas seguindo a
+// estética "shadow box" já usada no resto do app, focadas no front-end;
+// o CRUD de usuários (back-end) será integrado depois.
 export default function AppNavigator() {
   return (
     <NavigationContainer>
@@ -46,14 +52,11 @@ export default function AppNavigator() {
         <Stack.Screen name="Anonimo" component={AnonimoScreen} />
         <Stack.Screen name="Identificada" component={IdentificadaScreen} />
 
-        {/* Placeholder — tela ainda não recebida */}
-        <Stack.Screen name="Profile" component={PlaceholderScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+        <Stack.Screen name="CheckinHistory" component={CheckinHistoryScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
-
-// Tela temporária simples, só para a bottom bar funcionar antes do Figma das demais telas
-function PlaceholderScreen() {
-  return null;
 }

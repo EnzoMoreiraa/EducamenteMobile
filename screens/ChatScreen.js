@@ -16,9 +16,8 @@ export default function ChatScreen({ navigation }) {
           onPress={() => navigation.navigate("Anonimo")}
         >
           <View style={styles.optionIconWrapper}>
-            {/* Ícone real "secret 1" (balões de fala + cadeado) ainda não exportado do Figma */}
             <Image
-              source={require("../assets/images/placeholder.png")}
+              source={require("../assets/images/anonimous-icon.png")}
               style={styles.optionIcon}
               resizeMode="contain"
             />
@@ -34,9 +33,8 @@ export default function ChatScreen({ navigation }) {
           onPress={() => navigation.navigate("Identificada")}
         >
           <View style={styles.optionIconWrapper}>
-            {/* Ícone real "private 1" (casa com pessoas) ainda não exportado do Figma */}
             <Image
-              source={require("../assets/images/placeholder.png")}
+              source={require("../assets/images/identifed-icon.png")}
               style={styles.optionIcon}
               resizeMode="contain"
             />

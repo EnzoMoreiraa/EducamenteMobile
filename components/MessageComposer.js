@@ -1,12 +1,28 @@
 import { useState } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from "react-native";
 import { ScreenHeader } from "./Headers";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
 
 // Ferramentas de formatação do editor — mockadas (sem ação real ainda, RF06/RF07)
-const INSERT_TOOLS = ["+", "+", "+", "+", "+"];
-const FORMAT_TOOLS = ["A", "✎", "B", "I", "U", "S̶"];
-const ATTACH_TOOLS = ["📎", "🖼"];
+const ALIGN_LIST_TOOLS = [
+  require("../assets/images/textEdit/textLeft.png"),
+  require("../assets/images/textEdit/textCenter.png"),
+  require("../assets/images/textEdit/textRight.png"),
+  require("../assets/images/textEdit/listNum.png"),
+  require("../assets/images/textEdit/listPoint.png"),
+];
+const FORMAT_TOOLS = [
+  require("../assets/images/textEdit/caps.png"),
+  require("../assets/images/textEdit/markText.png"),
+  require("../assets/images/textEdit/bold.png"),
+  require("../assets/images/textEdit/italic.png"),
+  require("../assets/images/textEdit/underline.png"),
+  require("../assets/images/textEdit/strikethrough.png"),
+];
+const ATTACH_TOOLS = [
+  require("../assets/images/textEdit/addLink.png"),
+  require("../assets/images/textEdit/addImage.png"),
+];
 
 // Formulário compartilhado por AnonimoScreen e IdentificadaScreen (RF06/RF07)
 export default function MessageComposer({ title, caption, onBack, onSubmit }) {
@@ -26,7 +42,7 @@ export default function MessageComposer({ title, caption, onBack, onSubmit }) {
             value={messageTitle}
             onChangeText={setMessageTitle}
           />
-          <Text style={styles.pencilIcon}>✎</Text>
+          <Image source={require("../assets/images/textEdit/pencilEdit.png")} style={styles.pencilIcon} resizeMode="contain" />
         </View>
 
         <View style={styles.editorCard}>
@@ -35,17 +51,17 @@ export default function MessageComposer({ title, caption, onBack, onSubmit }) {
               <Text style={styles.categoriesText}>Categorias</Text>
               <Text style={styles.caret}>⌄</Text>
             </TouchableOpacity>
-            {INSERT_TOOLS.map((glyph, i) => (
-              <Text key={`insert-${i}`} style={styles.toolGlyph}>{glyph}</Text>
+            {ALIGN_LIST_TOOLS.map((icon, i) => (
+              <Image key={`align-${i}`} source={icon} style={styles.toolIcon} resizeMode="contain" />
             ))}
           </View>
 
           <View style={styles.toolbarRow}>
-            {FORMAT_TOOLS.map((glyph, i) => (
-              <Text key={`format-${i}`} style={styles.toolGlyph}>{glyph}</Text>
+            {FORMAT_TOOLS.map((icon, i) => (
+              <Image key={`format-${i}`} source={icon} style={styles.toolIcon} resizeMode="contain" />
             ))}
-            {ATTACH_TOOLS.map((glyph, i) => (
-              <Text key={`attach-${i}`} style={styles.toolGlyph}>{glyph}</Text>
+            {ATTACH_TOOLS.map((icon, i) => (
+              <Image key={`attach-${i}`} source={icon} style={styles.toolIcon} resizeMode="contain" />
             ))}
           </View>
 
@@ -99,8 +115,8 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
   },
   pencilIcon: {
-    fontSize: 18,
-    color: COLORS.textGray,
+    width: 20,
+    height: 20,
     marginLeft: 8,
   },
   editorCard: {
@@ -136,10 +152,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#475569",
   },
-  toolGlyph: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#475569",
+  toolIcon: {
+    width: 18,
+    height: 18,
   },
   editorPrompt: {
     fontSize: 16,

@@ -86,7 +86,7 @@ function MoodArc({ selectedIndex, onSelect }) {
     COLORS.moodHappy,
     COLORS.moodHappy,
   ];
-
+  // Alterar depois para mair UX
   const segments = segmentColors.map((color, index) => {
     const startAngle = Math.PI - (index / segmentColors.length) * Math.PI;
     const endAngle = Math.PI - ((index + 1) / segmentColors.length) * Math.PI;

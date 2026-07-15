@@ -17,7 +17,7 @@ export function ScreenHeader({ title, onBack }) {
   return (
     <View style={styles.screenHeaderContainer}>
       <TouchableOpacity onPress={onBack} style={styles.circleBackButton}>
-        <Text style={styles.circleBackArrow}>{"\u2039"}</Text>
+        <Image source={require("../assets/backButton.png")} style={styles.circleBackIcon} resizeMode="contain" />
       </TouchableOpacity>
       <Text style={styles.screenHeaderTitle}>{title}</Text>
     </View>
@@ -53,16 +53,12 @@ const styles = StyleSheet.create({
   circleBackButton: {
     width: 48,
     height: 48,
-    borderRadius: SIZES.radiusPill,
-    borderWidth: 1.2,
-    borderColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  circleBackArrow: {
-    fontSize: 22,
-    color: COLORS.primary,
-    fontWeight: "700",
+  circleBackIcon: {
+    width: 48,
+    height: 48,
   },
   screenHeaderTitle: {
     fontSize: 20,
