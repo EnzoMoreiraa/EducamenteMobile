@@ -3,23 +3,69 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 
 import { ScreenHeader } from "../components/Headers";
 import ConfirmModal from "../components/ConfirmModal";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import { API_URL } from "../services/api";
+import { getUsuarioLogado, setUsuarioLogado } from "../services/session";
 
 export default function EditProfileScreen({ navigation }) {
-  // Dados pré-carregados do usuário — viriam do back-end (GET /alunos/:id) futuramente
-  const [name, setName] = useState("Enzo");
-  const [lastName, setLastName] = useState("Moreira");
-  const [email, setEmail] = useState("enzo.moreira@aluno.senac.br");
+  const usuario = getUsuarioLogado();
+  const [name, setName] = useState(usuario?.nome ?? "");
+  const [lastName, setLastName] = useState(usuario?.sobrenome ?? "");
+  const [email, setEmail] = useState(usuario?.email ?? "");
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
-  const handleSave = () => {
-    // futuramente: PUT /alunos/:id no back-end
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${API_URL}/usuarios/${usuario.id_usuario}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome: name, sobrenome: lastName, email }),
+      });
+
+      if (response.ok) {
+        setUsuarioLogado({ ...usuario, nome: name, sobrenome: lastName, email });
+      }
+    } catch (erro) {
+      // segue sem bloquear a navegação — o usuário pode tentar salvar de novo depois
+    }
+
     navigation.goBack();
   };
 
-  const handleDeleteConfirm = () => {
-    // futuramente: DELETE /alunos/:id no back-end
+  const closeDeleteModal = () => {
     setDeleteModalVisible(false);
-    navigation.reset({ index: 0, routes: [{ name: "Splash" }] });
+    setDeletePassword("");
+    setDeleteError("");
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError("");
+
+    try {
+      const response = await fetch(`${API_URL}/usuarios/${usuario.id_usuario}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senha: deletePassword }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setDeleteError(data.mensagem || "Não foi possível excluir a conta.");
+        return;
+      }
+
+      closeDeleteModal();
+      setUsuarioLogado(null);
+      navigation.reset({ index: 0, routes: [{ name: "Splash" }] });
+    } catch (erro) {
+      setDeleteError("Erro de conexão com o servidor.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -78,11 +124,15 @@ export default function EditProfileScreen({ navigation }) {
         visible={deleteModalVisible}
         title="Excluir conta?"
         message="Essa ação é permanente e não pode ser desfeita. Todos os seus dados de check-in e agendamentos serão apagados."
-        confirmLabel="Excluir"
+        confirmLabel={deleting ? "Excluindo..." : "Excluir"}
         cancelLabel="Cancelar"
         destructive
+        requirePassword
+        password={deletePassword}
+        onPasswordChange={setDeletePassword}
+        passwordError={deleteError}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => setDeleteModalVisible(false)}
+        onCancel={closeDeleteModal}
       />
     </View>
   );

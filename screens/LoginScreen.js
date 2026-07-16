@@ -2,6 +2,8 @@ import { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView } from "react-native";
 import { AuthHeader } from "../components/Headers";
 import { COLORS, SIZES } from "../styles/theme";
+import { API_URL } from "../services/api";
+import { setUsuarioLogado } from "../services/session";
 
 export default function LoginScreen({ navigation, route }) {
   const role = route?.params?.role ?? "aluno";
@@ -9,6 +11,34 @@ export default function LoginScreen({ navigation, route }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [keepConnected, setKeepConnected] = useState(true);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha: password }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.mensagem || "Não foi possível entrar.");
+        return;
+      }
+
+      setUsuarioLogado(data.usuario);
+      navigation.replace("Home");
+    } catch (erro) {
+      setError("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -73,12 +103,15 @@ export default function LoginScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.actionButton}
-          onPress={() => navigation.replace("Home")}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.actionButtonText}>Entrar</Text>
+          <Text style={styles.actionButtonText}>{loading ? "Entrando..." : "Entrar"}</Text>
         </TouchableOpacity>
 
         <View style={styles.dividerRow}>
@@ -207,6 +240,12 @@ const styles = StyleSheet.create({
   forgotPassword: {
     fontSize: 13,
     color: COLORS.textDark,
+  },
+  errorText: {
+    color: "#C0392B",
+    fontSize: 13,
+    marginBottom: 12,
+    textAlign: "center",
   },
   actionButton: {
     backgroundColor: COLORS.primary,

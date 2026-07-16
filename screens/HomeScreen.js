@@ -2,6 +2,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, LayoutAnimation, UIManager, Platform } from "react-native";
 import BottomTabBar from "../components/BottomTabBar";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import { getUsuarioLogado } from "../services/session";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -15,8 +16,8 @@ const ARTICLES = [
 ];
 
 export default function HomeScreen({ navigation }) {
-  // Nome do usuário viria do estado de autenticação/contexto futuramente
-  const userName = "Enzo Moreira";
+  const usuario = getUsuarioLogado();
+  const userName = usuario ? `${usuario.nome} ${usuario.sobrenome ?? ""}`.trim() : "Visitante";
   const [centerIndex, setCenterIndex] = useState(0);
 
   const shiftCarousel = (direction) => {

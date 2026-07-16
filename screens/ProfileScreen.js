@@ -2,13 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-nati
 import { ScreenHeader } from "../components/Headers";
 import BottomTabBar from "../components/BottomTabBar";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
-
-// Dados do usuário logado — viriam do estado de autenticação/back-end futuramente
-const user = {
-  name: "Enzo Moreira",
-  email: "enzo.moreira@aluno.senac.br",
-  role: "Aluno",
-};
+import { getUsuarioLogado, setUsuarioLogado } from "../services/session";
 
 const MENU_ITEMS = [
   {
@@ -29,6 +23,16 @@ const MENU_ITEMS = [
 ];
 
 export default function ProfileScreen({ navigation }) {
+  const usuario = getUsuarioLogado();
+  const name = usuario ? `${usuario.nome} ${usuario.sobrenome ?? ""}`.trim() : "Visitante";
+  const email = usuario?.email ?? "";
+  const role = usuario?.tipo_usuario === "pedagogo" ? "Educador" : "Aluno";
+
+  const handleLogout = () => {
+    setUsuarioLogado(null);
+    navigation.reset({ index: 0, routes: [{ name: "Splash" }] });
+  };
+
   return (
     <View style={styles.container}>
       <ScreenHeader title="Perfil" onBack={() => navigation.goBack()} />
@@ -36,12 +40,12 @@ export default function ProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.summaryCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarLetter}>{user.name.charAt(0)}</Text>
+            <Text style={styles.avatarLetter}>{name.charAt(0)}</Text>
           </View>
-          <Text style={styles.userName}>{user.name}</Text>
-          <Text style={styles.userEmail}>{user.email}</Text>
+          <Text style={styles.userName}>{name}</Text>
+          <Text style={styles.userEmail}>{email}</Text>
           <View style={styles.roleBadge}>
-            <Text style={styles.roleBadgeText}>{user.role}</Text>
+            <Text style={styles.roleBadgeText}>{role}</Text>
           </View>
         </View>
 
@@ -68,7 +72,7 @@ export default function ProfileScreen({ navigation }) {
         <TouchableOpacity
           style={styles.logoutButton}
           activeOpacity={0.8}
-          onPress={() => navigation.reset({ index: 0, routes: [{ name: "Splash" }] })}
+          onPress={handleLogout}
         >
           <Text style={styles.logoutText}>Sair da conta</Text>
         </TouchableOpacity>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView } from "react-native";
 import { AuthHeader } from "../components/Headers";
 import { COLORS, SIZES } from "../styles/theme";
+import { API_URL } from "../services/api";
+import { setUsuarioLogado } from "../services/session";
 
 export default function RegisterScreen({ navigation, route }) {
   const role = route?.params?.role ?? "aluno";
@@ -12,6 +14,46 @@ export default function RegisterScreen({ navigation, route }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/usuarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: name,
+          sobrenome: lastName,
+          email,
+          senha: password,
+          tipo_usuario: role === "educador" ? "pedagogo" : "aluno",
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.mensagem || "Não foi possível criar a conta.");
+        return;
+      }
+
+      setUsuarioLogado({
+        id_usuario: data.id_usuario,
+        nome: name,
+        sobrenome: lastName,
+        email,
+        tipo_usuario: role === "educador" ? "pedagogo" : "aluno",
+      });
+      navigation.replace("Home");
+    } catch (erro) {
+      setError("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -108,12 +150,15 @@ export default function RegisterScreen({ navigation, route }) {
           </Text>
         </TouchableOpacity>
 
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.actionButton}
-          onPress={() => navigation.replace("Home")}
+          onPress={handleRegister}
+          disabled={loading}
         >
-          <Text style={styles.actionButtonText}>Entrar</Text>
+          <Text style={styles.actionButtonText}>{loading ? "Criando conta..." : "Entrar"}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -229,6 +274,12 @@ const styles = StyleSheet.create({
   termsLink: {
     color: COLORS.primary,
     fontWeight: "600",
+  },
+  errorText: {
+    color: "#C0392B",
+    fontSize: 13,
+    marginBottom: 12,
+    textAlign: "center",
   },
   actionButton: {
     backgroundColor: COLORS.primary,

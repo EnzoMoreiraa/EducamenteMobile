@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Modal, StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { COLORS, SIZES, SHADOW } from "../styles/theme";
 
 // Modal de confirmação reutilizável (ex.: excluir conta, descartar alterações)
@@ -9,9 +9,15 @@ export default function ConfirmModal({
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
   destructive = false,
+  requirePassword = false,
+  password = "",
+  onPasswordChange,
+  passwordError,
   onConfirm,
   onCancel,
 }) {
+  const confirmDisabled = requirePassword && password.length === 0;
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.overlay}>
@@ -19,13 +25,33 @@ export default function ConfirmModal({
           <Text style={styles.title}>{title}</Text>
           {message ? <Text style={styles.message}>{message}</Text> : null}
 
+          {requirePassword ? (
+            <View style={styles.passwordBlock}>
+              <Text style={styles.passwordLabel}>Confirme sua senha</Text>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Insira sua senha"
+                placeholderTextColor={COLORS.placeholder}
+                secureTextEntry
+                value={password}
+                onChangeText={onPasswordChange}
+              />
+              {passwordError ? <Text style={styles.passwordError}>{passwordError}</Text> : null}
+            </View>
+          ) : null}
+
           <View style={styles.actions}>
             <TouchableOpacity style={styles.cancelButton} activeOpacity={0.8} onPress={onCancel}>
               <Text style={styles.cancelText}>{cancelLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.confirmButton, destructive && styles.confirmButtonDestructive]}
+              style={[
+                styles.confirmButton,
+                destructive && styles.confirmButtonDestructive,
+                confirmDisabled && styles.confirmButtonDisabled,
+              ]}
               activeOpacity={0.85}
+              disabled={confirmDisabled}
               onPress={onConfirm}
             >
               <Text style={styles.confirmText}>{confirmLabel}</Text>
@@ -64,6 +90,28 @@ const styles = StyleSheet.create({
     color: COLORS.textGray,
     lineHeight: 20,
   },
+  passwordBlock: {
+    marginTop: 16,
+  },
+  passwordLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.textDark,
+    marginBottom: 6,
+  },
+  passwordInput: {
+    backgroundColor: COLORS.background,
+    borderRadius: SIZES.radiusMedium,
+    paddingHorizontal: 16,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: COLORS.textDark,
+  },
+  passwordError: {
+    fontSize: 12,
+    color: "#C0392B",
+    marginTop: 6,
+  },
   actions: {
     flexDirection: "row",
     gap: 12,
@@ -91,6 +139,9 @@ const styles = StyleSheet.create({
   },
   confirmButtonDestructive: {
     backgroundColor: "#C0392B",
+  },
+  confirmButtonDisabled: {
+    opacity: 0.5,
   },
   confirmText: {
     color: COLORS.white,
