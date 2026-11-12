@@ -1,5 +1,6 @@
-import { Modal, StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import { Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import PressableScale from "./PressableScale";
+import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
 // Modal de confirmação reutilizável (ex.: excluir conta, descartar alterações)
 export default function ConfirmModal({
@@ -41,21 +42,22 @@ export default function ConfirmModal({
           ) : null}
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelButton} activeOpacity={0.8} onPress={onCancel}>
+            <PressableScale style={styles.cancelButton} onPress={onCancel} accessibilityRole="button">
               <Text style={styles.cancelText}>{cancelLabel}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </PressableScale>
+
+            <PressableScale
               style={[
                 styles.confirmButton,
                 destructive && styles.confirmButtonDestructive,
                 confirmDisabled && styles.confirmButtonDisabled,
               ]}
-              activeOpacity={0.85}
               disabled={confirmDisabled}
               onPress={onConfirm}
+              accessibilityRole="button"
             >
               <Text style={styles.confirmText}>{confirmLabel}</Text>
-            </TouchableOpacity>
+            </PressableScale>
           </View>
         </View>
       </View>
@@ -69,21 +71,21 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.45)",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 32,
+    paddingHorizontal: SPACING.xxl,
   },
   card: {
     width: "100%",
     maxWidth: 340,
     backgroundColor: COLORS.cardBackground,
     borderRadius: SIZES.radiusLarge,
-    padding: 24,
+    padding: SPACING.xl,
     ...SHADOW,
   },
   title: {
     fontSize: 18,
     fontWeight: "800",
     color: COLORS.textDark,
-    marginBottom: 8,
+    marginBottom: SPACING.xs,
   },
   message: {
     fontSize: 14,
@@ -91,37 +93,39 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   passwordBlock: {
-    marginTop: 16,
+    marginTop: SPACING.md,
   },
   passwordLabel: {
     fontSize: 13,
     fontWeight: "600",
     color: COLORS.textDark,
-    marginBottom: 6,
+    marginBottom: SPACING.xxs + 2,
   },
   passwordInput: {
     backgroundColor: COLORS.background,
     borderRadius: SIZES.radiusMedium,
-    paddingHorizontal: 16,
-    paddingVertical: 13,
+    paddingHorizontal: SPACING.md,
+    minHeight: TOUCH.min,
     fontSize: 15,
     color: COLORS.textDark,
   },
   passwordError: {
     fontSize: 12,
-    color: "#C0392B",
-    marginTop: 6,
+    color: COLORS.danger,
+    marginTop: SPACING.xxs + 2,
+    fontWeight: "600",
   },
   actions: {
     flexDirection: "row",
-    gap: 12,
-    marginTop: 24,
+    gap: SPACING.sm,
+    marginTop: SPACING.xl,
   },
   cancelButton: {
     flex: 1,
     borderRadius: SIZES.radiusPill,
-    paddingVertical: 14,
+    minHeight: TOUCH.min,
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1.2,
     borderColor: COLORS.border,
   },
@@ -133,12 +137,13 @@ const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
     borderRadius: SIZES.radiusPill,
-    paddingVertical: 14,
+    minHeight: TOUCH.min,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.primary,
   },
   confirmButtonDestructive: {
-    backgroundColor: "#C0392B",
+    backgroundColor: COLORS.danger,
   },
   confirmButtonDisabled: {
     opacity: 0.5,

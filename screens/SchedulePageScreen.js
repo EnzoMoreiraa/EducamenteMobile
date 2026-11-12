@@ -1,23 +1,92 @@
 import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Switch } from "react-native";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import PressableScale from "../components/PressableScale";
+import { CalendarIcon } from "../components/IconSet";
+import { formatarDataLonga, parseDataBR } from "../utils/datas";
+import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
+
+const IS_WEB = Platform.OS === "web";
 
 export default function SchedulePageScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
+
   const [title, setTitle] = useState("");
   const [teacher, setTeacher] = useState("");
   const [subject, setSubject] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(null);
+  const [dateText, setDateText] = useState(""); // só no web, onde não há picker nativo
+  const [showPicker, setShowPicker] = useState(false);
+  const [time, setTime] = useState("");
   const [remindMe, setRemindMe] = useState(false);
+  const [erro, setErro] = useState("");
+
+  // No Android o picker é um modal do sistema e fecha sozinho na escolha;
+  // no iOS ele fica aberto (spinner) até o "Pronto".
+  const handleDateChange = (event, selecionada) => {
+    if (Platform.OS !== "ios") setShowPicker(false);
+    if (event?.type === "dismissed") return;
+    if (selecionada) {
+      setDate(selecionada);
+      setErro("");
+    }
+  };
+
+  const handleDateText = (texto) => {
+    setDateText(texto);
+    const parseada = parseDataBR(texto);
+    setDate(parseada);
+    if (parseada) setErro("");
+  };
+
+  const handleAgendar = () => {
+    if (!date) {
+      setErro("Escolha a data da conversa.");
+      return;
+    }
+
+    // O agendamento vai pronto pra tela do calendário — e, quando houver
+    // back-end, é esse mesmo objeto que alimenta POST /agendamentos
+    navigation.navigate("Calendar", {
+      novoAgendamento: {
+        id: `novo-${Date.now()}`,
+        titulo: title.trim() || "Conversa com a equipe pedagógica",
+        professor: teacher.trim(),
+        assunto: subject.trim(),
+        dataISO: date.toISOString(),
+        dia: date.getDate(),
+        mes: date.getMonth(),
+        ano: date.getFullYear(),
+        hora: time.trim(),
+        lembrete: remindMe,
+      },
+    });
+  };
 
   return (
-    <View style={styles.overlay}>
+    <KeyboardAvoidingView
+      style={styles.overlay}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <TouchableOpacity
         style={styles.backdrop}
         activeOpacity={1}
         onPress={() => navigation.goBack()}
+        accessibilityLabel="Fechar"
       />
 
-      <View style={styles.sheet}>
+      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, SPACING.xl) }]}>
+        <View style={styles.grabber} />
         <Text style={styles.title}>Agende uma conversa</Text>
 
         <TextInput
@@ -44,18 +113,64 @@ export default function SchedulePageScreen({ navigation }) {
           onChangeText={setSubject}
           multiline
           numberOfLines={4}
+          textAlignVertical="top"
         />
 
-        <View style={styles.dateInputWrapper}>
-          <TextInput
-            style={styles.dateInput}
-            placeholder="Data"
-            placeholderTextColor={COLORS.placeholder}
-            value={date}
-            onChangeText={setDate}
-          />
-          <Text style={styles.calendarGlyph}>📅</Text>
-        </View>
+        {IS_WEB ? (
+          <View style={styles.dateFieldRow}>
+            <TextInput
+              style={styles.dateTextInput}
+              placeholder="Data (dd/mm/aaaa)"
+              placeholderTextColor={COLORS.placeholder}
+              value={dateText}
+              onChangeText={handleDateText}
+            />
+            <CalendarIcon size={20} color={COLORS.textGray} />
+          </View>
+        ) : (
+          <PressableScale
+            style={styles.dateFieldRow}
+            onPress={() => setShowPicker(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Escolher a data da conversa"
+          >
+            <Text style={[styles.dateValue, !date && styles.dateValuePlaceholder]}>
+              {date ? formatarDataLonga(date) : "Data"}
+            </Text>
+            <CalendarIcon size={20} color={date ? COLORS.primary : COLORS.textGray} />
+          </PressableScale>
+        )}
+
+        {showPicker && !IS_WEB ? (
+          <View style={styles.pickerBlock}>
+            <DateTimePicker
+              value={date ?? new Date()}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={handleDateChange}
+            />
+            {Platform.OS === "ios" ? (
+              <PressableScale
+                style={styles.pickerDoneButton}
+                onPress={() => {
+                  if (!date) setDate(new Date());
+                  setShowPicker(false);
+                }}
+                accessibilityRole="button"
+              >
+                <Text style={styles.pickerDoneText}>Pronto</Text>
+              </PressableScale>
+            ) : null}
+          </View>
+        ) : null}
+
+        <TextInput
+          style={styles.input}
+          placeholder="Horário (Opcional) — ex: 14:30"
+          placeholderTextColor={COLORS.placeholder}
+          value={time}
+          onChangeText={setTime}
+        />
 
         <View style={styles.remindRow}>
           <Text style={styles.remindLabel}>Lembre-me</Text>
@@ -67,15 +182,17 @@ export default function SchedulePageScreen({ navigation }) {
           />
         </View>
 
-        <TouchableOpacity
-          activeOpacity={0.85}
+        {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+
+        <PressableScale
           style={styles.scheduleButton}
-          onPress={() => navigation.navigate("Calendar")}
+          onPress={handleAgendar}
+          accessibilityRole="button"
         >
           <Text style={styles.scheduleButtonText}>Agendar</Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -93,61 +210,105 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: SIZES.radiusLarge,
     borderTopRightRadius: SIZES.radiusLarge,
     padding: SIZES.paddingScreen,
-    paddingBottom: 36,
     ...SHADOW,
+  },
+  grabber: {
+    alignSelf: "center",
+    width: 44,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.border,
+    marginBottom: SPACING.md,
   },
   title: {
     fontSize: 18,
     fontWeight: "800",
     color: COLORS.textDark,
-    marginBottom: 18,
+    marginBottom: SPACING.md,
   },
   input: {
     backgroundColor: COLORS.background,
     borderRadius: SIZES.radiusMedium,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    minHeight: TOUCH.min,
     fontSize: 14,
     color: COLORS.textDark,
-    marginBottom: 14,
+    marginBottom: SPACING.sm + 2,
   },
   textArea: {
     minHeight: 90,
-    textAlignVertical: "top",
   },
-  dateInputWrapper: {
+  dateFieldRow: {
     flexDirection: "row",
     alignItems: "center",
+    gap: SPACING.xs,
     backgroundColor: COLORS.background,
     borderRadius: SIZES.radiusMedium,
-    paddingHorizontal: 16,
-    marginBottom: 18,
+    paddingHorizontal: SPACING.md,
+    minHeight: TOUCH.min,
+    marginBottom: SPACING.sm + 2,
   },
-  dateInput: {
+  dateTextInput: {
     flex: 1,
-    paddingVertical: 14,
+    minHeight: TOUCH.min,
     fontSize: 14,
     color: COLORS.textDark,
   },
-  calendarGlyph: {
-    fontSize: 16,
+  dateValue: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.textDark,
+  },
+  dateValuePlaceholder: {
+    fontWeight: "400",
+    color: COLORS.placeholder,
+  },
+  pickerBlock: {
+    backgroundColor: COLORS.background,
+    borderRadius: SIZES.radiusMedium,
+    marginBottom: SPACING.sm + 2,
+    paddingBottom: SPACING.xs,
+  },
+  pickerDoneButton: {
+    alignSelf: "center",
+    minHeight: TOUCH.min,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: SIZES.radiusPill,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pickerDoneText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: "700",
   },
   remindRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    minHeight: TOUCH.min,
+    marginBottom: SPACING.md,
   },
   remindLabel: {
     fontSize: 14,
     color: COLORS.textDark,
     fontWeight: "600",
   },
+  erro: {
+    fontSize: 13,
+    color: COLORS.danger,
+    fontWeight: "600",
+    marginBottom: SPACING.sm,
+  },
   scheduleButton: {
     backgroundColor: COLORS.primary,
     borderRadius: SIZES.radiusPill,
-    paddingVertical: 16,
+    minHeight: TOUCH.min + 10,
     alignItems: "center",
+    justifyContent: "center",
   },
   scheduleButtonText: {
     color: COLORS.white,

@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { StyleSheet, Text, View, Switch } from "react-native";
+import { ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/Headers";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeButton";
+import { BellIcon } from "../components/IconSet";
+import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Preferências de notificação — futuramente persistidas no back-end (RF09)
+// Preferências de notificação — futuramente persistidas na tabela
+// Preferencia_Notificacao do back-end (RF09)
 const PREFERENCES_CONFIG = [
   {
     key: "checkinReminder",
@@ -38,18 +42,22 @@ export default function NotificationsScreen({ navigation }) {
   const toggle = (key) => setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScreenHeader title="Notificações" onBack={() => navigation.goBack()} />
 
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.introCard}>
+          <BellIcon size={22} color={COLORS.primary} filled />
+          <Text style={styles.introText}>
+            Escolha o que faz sentido pra você. Dá pra mudar essas opções quando quiser.
+          </Text>
+        </View>
+
         <View style={styles.card}>
           {PREFERENCES_CONFIG.map((item, index) => (
             <View
               key={item.key}
-              style={[
-                styles.row,
-                index < PREFERENCES_CONFIG.length - 1 && styles.rowDivider,
-              ]}
+              style={[styles.row, index < PREFERENCES_CONFIG.length - 1 && styles.rowDivider]}
             >
               <View style={styles.rowTextBlock}>
                 <Text style={styles.rowLabel}>{item.label}</Text>
@@ -60,12 +68,15 @@ export default function NotificationsScreen({ navigation }) {
                 onValueChange={() => toggle(item.key)}
                 trackColor={{ false: COLORS.border, true: COLORS.primary }}
                 thumbColor={COLORS.white}
+                accessibilityLabel={item.label}
               />
             </View>
           ))}
         </View>
-      </View>
-    </View>
+      </ScrollView>
+
+      <FloatingHomeButton navigation={navigation} />
+    </SafeAreaView>
   );
 }
 
@@ -74,9 +85,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  content: {
+  scrollContent: {
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 8,
+    paddingTop: SPACING.xs,
+    paddingBottom: SPACING.xxl + TRIGGER_HEIGHT,
+    gap: SPACING.md,
+  },
+  introCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: SIZES.radiusMedium,
+    padding: SPACING.md,
+  },
+  introText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORS.textBrown,
   },
   card: {
     backgroundColor: COLORS.cardBackground,
@@ -86,8 +113,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    minHeight: TOUCH.min + 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
   rowDivider: {
     borderBottomWidth: 1,
@@ -95,7 +123,7 @@ const styles = StyleSheet.create({
   },
   rowTextBlock: {
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.sm,
   },
   rowLabel: {
     fontSize: 15,

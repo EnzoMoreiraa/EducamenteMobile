@@ -1,8 +1,13 @@
-import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
+import { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/Headers";
-import BottomTabBar from "../components/BottomTabBar";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import BottomTabBar, { TAB_BAR_HEIGHT } from "../components/BottomTabBar";
+import FloatingHomeButton from "../components/FloatingHomeButton";
+import PressableScale from "../components/PressableScale";
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "../components/IconSet";
+import { formatarDataCurta, MESES } from "../utils/datas";
+import { COLORS, SIZES, SPACING, TOUCH, SHADOW, SHADOW_FLOATING } from "../styles/theme";
 
 const WEEK_DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
@@ -26,7 +31,7 @@ const APPOINTMENTS = [
   },
 ];
 
-// Dias do mês com indicadores de quantidade de agendamentos (bolinhas), como no print
+// Dias do mês com indicadores de quantidade de agendamentos (bolinhas)
 const DAYS_WITH_DOTS = {
   3: 2,
   8: 1,
@@ -39,16 +44,39 @@ const DAYS_WITH_DOTS = {
   31: 3,
 };
 
-export default function CalendarPageScreen({ navigation }) {
+export default function CalendarPageScreen({ navigation, route }) {
   const [monthIndex, setMonthIndex] = useState(4); // Maio
   const [selectedDay, setSelectedDay] = useState(2);
+  const [extras, setExtras] = useState([]);
 
-  const monthNames = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  // Agendamento criado no modal "Agende uma conversa" chega pela rota
+  const novoAgendamento = route?.params?.novoAgendamento;
+  useEffect(() => {
+    if (!novoAgendamento) return;
+    setExtras((atuais) =>
+      atuais.some((item) => item.id === novoAgendamento.id)
+        ? atuais
+        : [...atuais, novoAgendamento]
+    );
+    setMonthIndex(novoAgendamento.mes);
+    setSelectedDay(novoAgendamento.dia);
+    navigation.setParams({ novoAgendamento: undefined });
+  }, [novoAgendamento, navigation]);
+
+  // Lista exibida: os exemplos fixos mais o que o aluno acabou de agendar
+  const agendamentos = [
+    ...APPOINTMENTS,
+    ...extras.map((item) => ({
+      id: item.id,
+      color: COLORS.primary,
+      time: `${formatarDataCurta(new Date(item.dataISO))}${item.hora ? `, ${item.hora}` : ""}`,
+      title: item.titulo,
+      subtitle:
+        item.assunto || (item.professor ? `Com ${item.professor}` : "Assunto a definir"),
+    })),
   ];
 
-  // Layout fixo de exemplo replicando o print (Maio/2026 começando na quarta)
+  // Layout fixo de exemplo replicando o protótipo (Maio/2026 começando na quarta)
   const calendarGrid = [
     [31, 30, 1, 2, 3, 4, 5],
     [6, 7, 8, 9, 10, 11, 12],
@@ -59,33 +87,41 @@ export default function CalendarPageScreen({ navigation }) {
   const fadedDays = [31, 30, 1, 2]; // dias do mês anterior/seguinte exibidos em cinza
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScreenHeader title="Agendar conversa" onBack={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.calendarCard}>
           <View style={styles.monthHeader}>
-            <TouchableOpacity
+            <PressableScale
               style={styles.monthArrowButton}
               onPress={() => setMonthIndex((m) => Math.max(0, m - 1))}
+              accessibilityRole="button"
+              accessibilityLabel="Mês anterior"
             >
-              <Text style={styles.monthArrowText}>{"\u2039"}</Text>
-            </TouchableOpacity>
+              <ChevronLeftIcon size={18} color={COLORS.textDark} />
+            </PressableScale>
+
             <View style={styles.monthLabelBlock}>
-              <Text style={styles.monthLabel}>{monthNames[monthIndex]}</Text>
+              <Text style={styles.monthLabel}>{MESES[monthIndex]}</Text>
               <Text style={styles.yearLabel}>2026</Text>
             </View>
-            <TouchableOpacity
+
+            <PressableScale
               style={styles.monthArrowButton}
               onPress={() => setMonthIndex((m) => Math.min(11, m + 1))}
+              accessibilityRole="button"
+              accessibilityLabel="Próximo mês"
             >
-              <Text style={styles.monthArrowText}>{"\u203a"}</Text>
-            </TouchableOpacity>
+              <ChevronRightIcon size={18} color={COLORS.textDark} />
+            </PressableScale>
           </View>
 
           <View style={styles.weekDaysRow}>
             {WEEK_DAYS.map((day) => (
-              <Text key={day} style={styles.weekDayLabel}>{day}</Text>
+              <Text key={day} style={styles.weekDayLabel}>
+                {day}
+              </Text>
             ))}
           </View>
 
@@ -99,14 +135,22 @@ export default function CalendarPageScreen({ navigation }) {
                 const dots = !isFaded ? DAYS_WITH_DOTS[day] : null;
 
                 return (
-                  <TouchableOpacity
+                  <PressableScale
                     key={`${weekIndex}-${dayIndex}`}
                     style={styles.dayCell}
                     disabled={isFaded}
                     onPress={() => setSelectedDay(day)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Dia ${day}`}
                   >
                     <View style={[styles.dayNumberWrapper, isSelected && styles.dayNumberSelected]}>
-                      <Text style={[styles.dayNumber, isFaded && styles.dayNumberFaded, isSelected && styles.dayNumberTextSelected]}>
+                      <Text
+                        style={[
+                          styles.dayNumber,
+                          isFaded && styles.dayNumberFaded,
+                          isSelected && styles.dayNumberTextSelected,
+                        ]}
+                      >
                         {day}
                       </Text>
                     </View>
@@ -117,7 +161,7 @@ export default function CalendarPageScreen({ navigation }) {
                         ))}
                       </View>
                     ) : null}
-                  </TouchableOpacity>
+                  </PressableScale>
                 );
               })}
             </View>
@@ -125,35 +169,33 @@ export default function CalendarPageScreen({ navigation }) {
         </View>
 
         <View style={styles.appointmentsList}>
-          {APPOINTMENTS.map((item) => (
+          {agendamentos.map((item) => (
             <View key={item.id} style={styles.appointmentCard}>
               <View style={styles.appointmentHeaderRow}>
                 <View style={[styles.appointmentDot, { backgroundColor: item.color }]} />
                 <Text style={styles.appointmentTime}>{item.time}</Text>
-                <Text style={styles.appointmentMore}>•••</Text>
               </View>
               <Text style={styles.appointmentTitle}>{item.title}</Text>
-              <Text style={styles.appointmentSubtitle}>
-                {item.subtitle}{" "}
-                {item.subtitle.endsWith("...") && (
-                  <Text style={styles.viewMore}>View more</Text>
-                )}
-              </Text>
+              <Text style={styles.appointmentSubtitle}>{item.subtitle}</Text>
             </View>
           ))}
         </View>
       </ScrollView>
 
-      <TouchableOpacity
-        style={styles.fab}
-        activeOpacity={0.85}
-        onPress={() => navigation.navigate("SchedulePage")}
-      >
-        <Text style={styles.fabPlus}>+</Text>
-      </TouchableOpacity>
+      <FloatingHomeButton navigation={navigation} bottomOffset={TAB_BAR_HEIGHT} />
 
+      {/* FAB no canto inferior direito pra não disputar espaço com o atalho de Home.
+          Vem depois do FloatingHomeButton pra ficar por cima da faixa de toque dele. */}
+      <PressableScale
+        style={styles.fab}
+        onPress={() => navigation.navigate("SchedulePage")}
+        accessibilityRole="button"
+        accessibilityLabel="Agendar nova conversa"
+      >
+        <PlusIcon size={26} color={COLORS.white} />
+      </PressableScale>
       <BottomTabBar navigation={navigation} active="Calendar" />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -164,34 +206,30 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 8,
-    paddingBottom: 24,
+    paddingTop: SPACING.xs,
+    paddingBottom: SPACING.xxl,
   },
   calendarCard: {
     backgroundColor: COLORS.cardBackground,
     borderRadius: SIZES.radiusMedium,
-    padding: 16,
+    padding: SPACING.md,
     ...SHADOW,
-    marginBottom: 20,
+    marginBottom: SPACING.lg,
   },
   monthHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: SPACING.sm,
   },
   monthArrowButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: TOUCH.min,
+    height: TOUCH.min,
+    borderRadius: TOUCH.min / 2,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: "center",
     justifyContent: "center",
-  },
-  monthArrowText: {
-    fontSize: 16,
-    color: COLORS.textDark,
   },
   monthLabelBlock: {
     alignItems: "center",
@@ -207,7 +245,7 @@ const styles = StyleSheet.create({
   },
   weekDaysRow: {
     flexDirection: "row",
-    marginBottom: 6,
+    marginBottom: SPACING.xxs + 2,
   },
   weekDayLabel: {
     flex: 1,
@@ -220,13 +258,15 @@ const styles = StyleSheet.create({
   },
   dayCell: {
     flex: 1,
+    minHeight: TOUCH.min,
     alignItems: "center",
-    paddingVertical: 4,
+    justifyContent: "center",
+    paddingVertical: SPACING.xxs,
   },
   dayNumberWrapper: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -248,6 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 2,
     gap: 2,
+    height: 4,
   },
   dot: {
     width: 4,
@@ -256,33 +297,29 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   appointmentsList: {
-    gap: 14,
+    gap: SPACING.sm + 2,
   },
   appointmentCard: {
     backgroundColor: COLORS.cardBackground,
     borderRadius: SIZES.radiusMedium,
-    padding: 16,
+    padding: SPACING.md,
     ...SHADOW,
   },
   appointmentHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 6,
+    marginBottom: SPACING.xxs + 2,
   },
   appointmentDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 8,
+    marginRight: SPACING.xs,
   },
   appointmentTime: {
     fontSize: 12,
     color: COLORS.textGray,
     flex: 1,
-  },
-  appointmentMore: {
-    fontSize: 14,
-    color: COLORS.textGray,
   },
   appointmentTitle: {
     fontSize: 15,
@@ -294,25 +331,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textGray,
   },
-  viewMore: {
-    color: COLORS.accent,
-    fontWeight: "600",
-  },
   fab: {
     position: "absolute",
-    bottom: 90,
-    alignSelf: "center",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    right: SIZES.paddingScreen,
+    bottom: TAB_BAR_HEIGHT + SPACING.md,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
-    ...SHADOW,
-  },
-  fabPlus: {
-    fontSize: 28,
-    color: COLORS.white,
-    fontWeight: "300",
+    ...SHADOW_FLOATING,
   },
 });

@@ -1,28 +1,76 @@
-import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, ScrollView } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AuthHeader } from "../components/Headers";
-import { COLORS, SIZES } from "../styles/theme";
+import AnimatedInput from "../components/AnimatedInput";
+import AuthTabSelector from "../components/AuthTabSelector";
+import BackgroundPattern from "../components/BackgroundPattern";
+import PressableScale from "../components/PressableScale";
+import { CheckIcon } from "../components/IconSet";
+import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 import { API_URL } from "../services/api";
 import { setUsuarioLogado } from "../services/session";
+import { isEmailValido, isVazio, rotaInicialPorTipo } from "../utils/validators";
 
 export default function LoginScreen({ navigation, route }) {
   const role = route?.params?.role ?? "aluno";
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [keepConnected, setKeepConnected] = useState(true);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Entrada do formulário: vem da esquerda (é a aba da esquerda do seletor)
+  const slide = useRef(new Animated.Value(-28)).current;
+  const fade = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(slide, { toValue: 0, useNativeDriver: true, friction: 9, tension: 80 }),
+      Animated.timing(fade, { toValue: 1, duration: 260, useNativeDriver: true }),
+    ]).start();
+  }, [fade, slide]);
+
+  // Sai deslizando para a esquerda antes de trocar para o Cadastro
+  const goToRegister = () => {
+    Animated.parallel([
+      Animated.timing(slide, { toValue: -32, duration: 170, useNativeDriver: true }),
+      Animated.timing(fade, { toValue: 0, duration: 170, useNativeDriver: true }),
+    ]).start(() => navigation.replace("Register", { role }));
+  };
+
+  const validar = () => {
+    const erros = {};
+    if (isVazio(email)) erros.email = "Informe seu e-mail.";
+    else if (!isEmailValido(email)) erros.email = "E-mail inválido. Exemplo: nome@escola.com";
+    if (isVazio(password)) erros.password = "Informe sua senha.";
+
+    setFieldErrors(erros);
+    return Object.keys(erros).length === 0;
+  };
+
   const handleLogin = async () => {
     setError("");
-    setLoading(true);
+    if (!validar()) return;
 
+    setLoading(true);
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha: password }),
+        body: JSON.stringify({ email: email.trim(), senha: password }),
       });
       const data = await response.json();
 
@@ -32,7 +80,7 @@ export default function LoginScreen({ navigation, route }) {
       }
 
       setUsuarioLogado(data.usuario);
-      navigation.replace("Home");
+      navigation.replace(rotaInicialPorTipo(data.usuario?.tipo_usuario));
     } catch (erro) {
       setError("Erro de conexão com o servidor.");
     } finally {
@@ -42,7 +90,8 @@ export default function LoginScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerBlock}>
+      <View style={[styles.headerBlock, { paddingTop: insets.top + SPACING.xs }]}>
+        <BackgroundPattern height={220} />
         <AuthHeader onBack={() => navigation.goBack()} />
         <Text style={styles.title}>Que bom te ver de novo!</Text>
         <Text style={styles.subtitle}>
@@ -50,88 +99,95 @@ export default function LoginScreen({ navigation, route }) {
         </Text>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.formContainer}
-        keyboardShouldPersistTaps="handled"
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.tabSelector}>
-          <View style={[styles.tab, styles.tabActive]}>
-            <Text style={styles.tabActiveText}>Entrar</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.tab}
-            onPress={() => navigation.replace("Register", { role })}
-          >
-            <Text style={styles.tabInactiveText}>Cadastrar-se</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>E-mail</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Insira seu e-mail"
-          placeholderTextColor={COLORS.placeholder}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <Text style={styles.label}>Senha</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Insira sua senha"
-          placeholderTextColor={COLORS.placeholder}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <View style={styles.row}>
-          <TouchableOpacity
-            style={styles.checkboxRow}
-            onPress={() => setKeepConnected(!keepConnected)}
-          >
-            <View style={[styles.checkbox, keepConnected && styles.checkboxChecked]}>
-              {keepConnected && <Text style={styles.checkboxMark}>✓</Text>}
-            </View>
-            <Text style={styles.checkboxLabel}>Manter conectado</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Text style={styles.forgotPassword}>Esqueceu sua senha?</Text>
-          </TouchableOpacity>
-        </View>
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.actionButton}
-          onPress={handleLogin}
-          disabled={loading}
+        <ScrollView
+          contentContainerStyle={[styles.formContainer, { paddingBottom: insets.bottom + SPACING.huge }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.actionButtonText}>{loading ? "Entrando..." : "Entrar"}</Text>
-        </TouchableOpacity>
+          <AuthTabSelector activeIndex={0} onChange={goToRegister} />
 
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Ou continue com</Text>
-          <View style={styles.dividerLine} />
-        </View>
+          <Animated.View style={{ opacity: fade, transform: [{ translateX: slide }] }}>
+            <AnimatedInput
+              label="E-mail"
+              placeholder="Insira seu e-mail"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              error={fieldErrors.email}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              containerStyle={styles.field}
+            />
 
-        <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../assets/gmail-logo.png")} style={styles.socialIcon} resizeMode="contain" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../assets/apple-logo.png")} style={styles.socialIcon} resizeMode="contain" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Image source={require("../assets/microsoft-logo.png")} style={styles.socialIcon} resizeMode="contain" />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <AnimatedInput
+              label="Senha"
+              placeholder="Insira sua senha"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+              }}
+              error={fieldErrors.password}
+              secureTextEntry
+              containerStyle={styles.field}
+            />
+
+            <View style={styles.row}>
+              <PressableScale
+                style={styles.checkboxRow}
+                onPress={() => setKeepConnected(!keepConnected)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: keepConnected }}
+              >
+                <View style={[styles.checkbox, keepConnected && styles.checkboxChecked]}>
+                  {keepConnected ? <CheckIcon size={12} color={COLORS.white} /> : null}
+                </View>
+                <Text style={styles.checkboxLabel}>Manter conectado</Text>
+              </PressableScale>
+
+              <PressableScale style={styles.forgotButton}>
+                <Text style={styles.forgotPassword}>Esqueceu sua senha?</Text>
+              </PressableScale>
+            </View>
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <PressableScale
+              style={[styles.actionButton, loading && styles.actionButtonDisabled]}
+              onPress={handleLogin}
+              disabled={loading}
+              accessibilityRole="button"
+            >
+              <Text style={styles.actionButtonText}>{loading ? "Entrando..." : "Entrar"}</Text>
+            </PressableScale>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>Ou continue com</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <View style={styles.socialRow}>
+              <PressableScale style={styles.socialButton} accessibilityLabel="Entrar com Google">
+                <Image source={require("../assets/gmail-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+              </PressableScale>
+              <PressableScale style={styles.socialButton} accessibilityLabel="Entrar com Apple">
+                <Image source={require("../assets/apple-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+              </PressableScale>
+              <PressableScale style={styles.socialButton} accessibilityLabel="Entrar com Microsoft">
+                <Image source={require("../assets/microsoft-logo.png")} style={styles.socialIcon} resizeMode="contain" />
+              </PressableScale>
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -141,118 +197,94 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  flex: {
+    flex: 1,
+  },
   headerBlock: {
     backgroundColor: COLORS.primary,
-    paddingBottom: 32,
+    paddingBottom: SPACING.xxl,
     borderBottomLeftRadius: SIZES.radiusLarge,
     borderBottomRightRadius: SIZES.radiusLarge,
+    overflow: "hidden",
   },
   title: {
     fontSize: 26,
     fontWeight: "800",
     color: COLORS.white,
     paddingHorizontal: SIZES.paddingScreen,
-    marginTop: 20,
+    marginTop: SPACING.lg,
   },
   subtitle: {
     fontSize: 15,
     color: "rgba(255,255,255,0.85)",
     paddingHorizontal: SIZES.paddingScreen,
-    marginTop: 6,
+    marginTop: SPACING.xxs + 2,
     lineHeight: 20,
   },
   formContainer: {
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 24,
-    paddingBottom: 40,
+    paddingTop: SPACING.xl,
   },
-  tabSelector: {
-    flexDirection: "row",
-    backgroundColor: "#E4E1DC",
-    borderRadius: SIZES.radiusPill,
-    padding: 4,
-    marginBottom: 24,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: SIZES.radiusPill,
-    alignItems: "center",
-  },
-  tabActive: {
-    backgroundColor: COLORS.white,
-  },
-  tabActiveText: {
-    fontWeight: "700",
-    color: COLORS.textDark,
-  },
-  tabInactiveText: {
-    color: COLORS.textGray,
-    fontWeight: "600",
-  },
-  label: {
-    fontSize: 14,
-    color: COLORS.textDark,
-    marginBottom: 6,
-    fontWeight: "600",
-  },
-  input: {
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.radiusMedium,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    fontSize: 15,
-    marginBottom: 18,
-    color: COLORS.textDark,
+  field: {
+    marginBottom: SPACING.md,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    flexWrap: "wrap",
+    gap: SPACING.xs,
+    marginBottom: SPACING.lg,
   },
   checkboxRow: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: TOUCH.min,
+    paddingRight: SPACING.xs,
   },
   checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 5,
     borderWidth: 1.5,
     borderColor: COLORS.primary,
-    marginRight: 8,
+    marginRight: SPACING.xs,
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxChecked: {
     backgroundColor: COLORS.primary,
   },
-  checkboxMark: {
-    color: COLORS.white,
-    fontSize: 11,
-    fontWeight: "700",
-  },
   checkboxLabel: {
     fontSize: 13,
     color: COLORS.textDark,
   },
+  forgotButton: {
+    minHeight: TOUCH.min,
+    justifyContent: "center",
+  },
   forgotPassword: {
     fontSize: 13,
     color: COLORS.textDark,
+    fontWeight: "600",
   },
   errorText: {
-    color: "#C0392B",
+    color: COLORS.danger,
     fontSize: 13,
-    marginBottom: 12,
+    marginBottom: SPACING.sm,
     textAlign: "center",
+    fontWeight: "600",
   },
   actionButton: {
     backgroundColor: COLORS.primary,
     borderRadius: SIZES.radiusPill,
-    paddingVertical: 16,
+    minHeight: TOUCH.min + 10,
     alignItems: "center",
-    marginBottom: 24,
+    justifyContent: "center",
+    marginBottom: SPACING.xl,
+  },
+  actionButtonDisabled: {
+    opacity: 0.7,
   },
   actionButtonText: {
     color: COLORS.white,
@@ -262,7 +294,7 @@ const styles = StyleSheet.create({
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: SPACING.lg,
   },
   dividerLine: {
     flex: 1,
@@ -270,18 +302,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dividerText: {
-    marginHorizontal: 10,
+    marginHorizontal: SPACING.xs,
     color: COLORS.textGray,
     fontSize: 13,
   },
   socialRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 16,
+    gap: SPACING.md,
   },
   socialButton: {
-    width: 64,
-    height: 48,
+    width: 68,
+    height: TOUCH.min + 4,
     borderRadius: SIZES.radiusSmall,
     backgroundColor: COLORS.white,
     alignItems: "center",

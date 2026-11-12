@@ -1,6 +1,9 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/Headers";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeButton";
+import { HistoryIcon } from "../components/IconSet";
+import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
 // Histórico mockado — futuramente virá da entidade Checkin_Emocional do back-end.
 // Hoje o check-in é só a escala de humor; futuramente será um questionário completo (RF04).
@@ -15,10 +18,18 @@ const HISTORY = [
 
 export default function CheckinHistoryScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScreenHeader title="Histórico de Check-in" onBack={() => navigation.goBack()} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.introCard}>
+          <HistoryIcon size={22} color={COLORS.primary} filled />
+          <Text style={styles.introText}>
+            Olhar seus registros ao longo dos dias ajuda a perceber padrões que passam
+            despercebidos no dia a dia.
+          </Text>
+        </View>
+
         {HISTORY.map((item) => (
           <View key={item.id} style={styles.historyCard}>
             <View style={[styles.moodDot, { backgroundColor: item.color }]} />
@@ -29,7 +40,9 @@ export default function CheckinHistoryScreen({ navigation }) {
           </View>
         ))}
       </ScrollView>
-    </View>
+
+      <FloatingHomeButton navigation={navigation} />
+    </SafeAreaView>
   );
 }
 
@@ -40,23 +53,38 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 8,
-    paddingBottom: 24,
-    gap: 12,
+    paddingTop: SPACING.xs,
+    paddingBottom: SPACING.xxl + TRIGGER_HEIGHT,
+    gap: SPACING.sm,
+  },
+  introCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.sm,
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: SIZES.radiusMedium,
+    padding: SPACING.md,
+    marginBottom: SPACING.xxs,
+  },
+  introText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORS.textBrown,
   },
   historyCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: COLORS.cardBackground,
     borderRadius: SIZES.radiusMedium,
-    padding: 16,
+    padding: SPACING.md,
     ...SHADOW,
   },
   moodDot: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    marginRight: 14,
+    marginRight: SPACING.sm + 2,
   },
   historyTextBlock: {
     flex: 1,

@@ -1,50 +1,69 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/Headers";
-import { COLORS, SIZES, SHADOW } from "../styles/theme";
+import BottomTabBar, { TAB_BAR_HEIGHT } from "../components/BottomTabBar";
+import FloatingHomeButton from "../components/FloatingHomeButton";
+import PressableScale from "../components/PressableScale";
+import { ChevronRightIcon, MaskIcon, UserIcon } from "../components/IconSet";
+import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
 // Hub de entrada do canal de comunicação — escolha entre mensagem anônima (RF07)
 // ou identificada (RF06) antes de abrir o formulário
+const OPCOES = [
+  {
+    key: "Anonimo",
+    title: "Anônima",
+    description: "A equipe lê sua mensagem sem saber quem enviou.",
+    Icon: MaskIcon,
+    tint: COLORS.anonimoSoft,
+    color: COLORS.anonimo,
+  },
+  {
+    key: "Identificada",
+    title: "Identificada",
+    description: "Você se identifica e pode receber uma resposta.",
+    Icon: UserIcon,
+    tint: COLORS.primarySoft,
+    color: COLORS.primary,
+  },
+];
+
 export default function ChatScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScreenHeader title="Envie uma mensagem" onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
-        <TouchableOpacity
-          style={styles.optionCard}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Anonimo")}
-        >
-          <View style={styles.optionIconWrapper}>
-            <Image
-              source={require("../assets/images/anonimous-icon.png")}
-              style={styles.optionIcon}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={styles.optionFooter}>
-            <Text style={styles.optionFooterText}>Mensagem Anônima</Text>
-          </View>
-        </TouchableOpacity>
+        <Text style={styles.intro}>
+          Escolha como quer falar com a equipe pedagógica. Os dois caminhos chegam nas
+          mesmas pessoas.
+        </Text>
 
-        <TouchableOpacity
-          style={styles.optionCard}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Identificada")}
-        >
-          <View style={styles.optionIconWrapper}>
-            <Image
-              source={require("../assets/images/identifed-icon.png")}
-              style={styles.optionIcon}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={styles.optionFooter}>
-            <Text style={styles.optionFooterText}>Mensagem Identificada</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.cardsRow}>
+          {OPCOES.map(({ key, title, description, Icon, tint, color }) => (
+            <PressableScale
+              key={key}
+              style={[styles.card, { backgroundColor: tint }]}
+              onPress={() => navigation.navigate(key)}
+              accessibilityRole="button"
+              accessibilityLabel={`Mensagem ${title}`}
+            >
+              <View style={[styles.cardIcon, { backgroundColor: color }]}>
+                <Icon size={26} color={COLORS.white} />
+              </View>
+              <Text style={[styles.cardTitle, { color }]}>{title}</Text>
+              <Text style={styles.cardDescription}>{description}</Text>
+              <View style={styles.cardArrow}>
+                <ChevronRightIcon size={18} color={color} />
+              </View>
+            </PressableScale>
+          ))}
+        </View>
       </View>
-    </View>
+
+      <FloatingHomeButton navigation={navigation} bottomOffset={TAB_BAR_HEIGHT} />
+      <BottomTabBar navigation={navigation} active="Chat" />
+    </SafeAreaView>
   );
 }
 
@@ -56,35 +75,46 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 24,
-    gap: 40,
-    alignItems: "center",
+    paddingTop: SPACING.md,
   },
-  optionCard: {
-    width: "100%",
-    maxWidth: 320,
-    backgroundColor: "rgba(255,255,255,0.8)",
-    borderRadius: SIZES.radiusLarge,
-    overflow: "hidden",
+  intro: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: COLORS.textGray,
+    marginBottom: SPACING.lg,
+  },
+  cardsRow: {
+    flexDirection: "row",
+    gap: SPACING.sm,
+  },
+  card: {
+    flex: 1,
+    borderRadius: SIZES.radiusMedium,
+    padding: SPACING.md,
+    minHeight: 180,
     ...SHADOW,
   },
-  optionIconWrapper: {
-    height: 232,
+  cardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: SPACING.sm,
   },
-  optionIcon: {
-    width: 180,
-    height: 180,
-  },
-  optionFooter: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 18,
-    alignItems: "center",
-  },
-  optionFooterText: {
-    color: COLORS.white,
+  cardTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "800",
+    letterSpacing: -0.2,
+    marginBottom: SPACING.xxs,
+  },
+  cardDescription: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: COLORS.textGray,
+  },
+  cardArrow: {
+    marginTop: "auto",
+    alignSelf: "flex-end",
   },
 });

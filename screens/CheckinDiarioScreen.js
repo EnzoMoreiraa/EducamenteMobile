@@ -1,8 +1,12 @@
 import { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path, Rect } from "react-native-svg";
 import { ScreenHeader } from "../components/Headers";
-import { COLORS, SIZES } from "../styles/theme";
+import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeButton";
+import PressableScale from "../components/PressableScale";
+import Toast from "../components/Toast";
+import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 
 // Opções de humor, da esquerda (mais triste) para a direita (mais feliz),
 // espelhando as cores do arco no protótipo Figma.
@@ -14,13 +18,19 @@ const MOODS = [
   { key: "muito_bem", label: "Me sinto muito bem", mouth: "M26 56 Q50 84 74 56", color: COLORS.moodHappy },
 ];
 
-export default function CheckinDiarioScreen({ navigation }) {
-  const [selectedIndex, setSelectedIndex] = useState(2); // começa em "neutro", como no print
+const MAX_ARC_WIDTH = 320;
 
+export default function CheckinDiarioScreen({ navigation }) {
+  const [selectedIndex, setSelectedIndex] = useState(2); // começa em "neutro", como no protótipo
+  const [registrado, setRegistrado] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
+
+  // O arco encolhe junto com a tela pra nunca ser cortado em telas de 375pt
+  const arcWidth = Math.min(MAX_ARC_WIDTH, windowWidth - SIZES.paddingScreen * 2);
   const selectedMood = MOODS[selectedIndex];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScreenHeader title="Check-in Diário" onBack={() => navigation.goBack()} />
 
       <View style={styles.content}>
@@ -36,17 +46,28 @@ export default function CheckinDiarioScreen({ navigation }) {
           <DoubleChevronDown />
         </View>
 
-        <MoodArc selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
+        <MoodArc width={arcWidth} selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
 
-        <TouchableOpacity
-          activeOpacity={0.8}
+        <PressableScale
           style={styles.confirmButton}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => setRegistrado(true)}
+          accessibilityRole="button"
         >
           <Text style={styles.confirmButtonText}>Confirmar</Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
-    </View>
+
+      <Toast
+        visible={registrado}
+        message="Check-in registrado. Obrigado por se olhar hoje!"
+        onHide={() => {
+          setRegistrado(false);
+          navigation.navigate("Home");
+        }}
+      />
+
+      <FloatingHomeButton navigation={navigation} />
+    </SafeAreaView>
   );
 }
 
@@ -71,13 +92,12 @@ function DoubleChevronDown() {
   );
 }
 
-// Arco de seleção de humor — 5 segmentos coloridos, tocáveis, com um indicador (gota) no centro
-function MoodArc({ selectedIndex, onSelect }) {
-  const width = 320;
-  const height = 170;
+// Arco de seleção de humor — 5 segmentos coloridos, tocáveis, com um indicador no centro
+function MoodArc({ width, selectedIndex, onSelect }) {
+  const radius = width / 2 - 10;
+  const height = radius + 20;
   const cx = width / 2;
   const cy = height;
-  const radius = 150;
 
   const segmentColors = [
     COLORS.moodVeryBad,
@@ -86,7 +106,7 @@ function MoodArc({ selectedIndex, onSelect }) {
     COLORS.moodHappy,
     COLORS.moodHappy,
   ];
-  // Alterar depois para mair UX
+
   const segments = segmentColors.map((color, index) => {
     const startAngle = Math.PI - (index / segmentColors.length) * Math.PI;
     const endAngle = Math.PI - ((index + 1) / segmentColors.length) * Math.PI;
@@ -101,9 +121,8 @@ function MoodArc({ selectedIndex, onSelect }) {
     return { path, color, index };
   });
 
-  // Ângulo do indicador (gota), apontando para o segmento selecionado
-  const indicatorAngle =
-    Math.PI - ((selectedIndex + 0.5) / segmentColors.length) * Math.PI;
+  // Ângulo do indicador, apontando para o segmento selecionado
+  const indicatorAngle = Math.PI - ((selectedIndex + 0.5) / segmentColors.length) * Math.PI;
   const indicatorX = cx + (radius - 18) * Math.cos(indicatorAngle);
   const indicatorY = cy - (radius - 18) * Math.sin(indicatorAngle);
 
@@ -120,12 +139,7 @@ function MoodArc({ selectedIndex, onSelect }) {
           />
         ))}
       </Svg>
-      <View
-        style={[
-          styles.indicatorDot,
-          { left: indicatorX - 9, top: indicatorY - 9 },
-        ]}
-      />
+      <View style={[styles.indicatorDot, { left: indicatorX - 9, top: indicatorY - 9 }]} />
     </View>
   );
 }
@@ -139,21 +153,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 12,
+    paddingTop: SPACING.sm,
   },
   question: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "800",
     color: COLORS.textBrown,
     textAlign: "center",
     letterSpacing: -0.3,
-    lineHeight: 33,
-    marginBottom: 32,
+    lineHeight: 32,
+    marginBottom: SPACING.xxl,
   },
   moodBlock: {
     alignItems: "center",
-    gap: 20,
-    marginBottom: 12,
+    gap: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
   selectedLabel: {
     fontSize: 16,
@@ -170,7 +184,7 @@ const styles = StyleSheet.create({
   },
   arcWrapper: {
     position: "relative",
-    marginBottom: 24,
+    marginBottom: SPACING.xl,
   },
   indicatorDot: {
     position: "absolute",
@@ -184,10 +198,13 @@ const styles = StyleSheet.create({
   confirmButton: {
     backgroundColor: COLORS.primary,
     borderRadius: SIZES.radiusPill,
-    paddingVertical: 16,
-    paddingHorizontal: 48,
+    minHeight: TOUCH.min + 12,
+    paddingHorizontal: SPACING.huge + 8,
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: "auto",
-    marginBottom: 24,
+    // reserva a faixa de toque do FloatingHomeButton
+    marginBottom: SPACING.xl + TRIGGER_HEIGHT,
   },
   confirmButtonText: {
     color: COLORS.white,

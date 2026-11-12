@@ -9,7 +9,13 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/usuarios', async (req, res) => {
-    const {nome, sobrenome, email, senha, tipo_usuario, ano_escolar, faixa_etaria, tipo_pedagogo} = req.body;
+    const {nome, sobrenome, email, senha, tipo_usuario} = req.body;
+
+    // Campos opcionais: o mysql2 recusa parâmetros undefined, então tudo que o
+    // formulário ainda não envia precisa virar NULL antes de chegar na query
+    const ano_escolar = req.body.ano_escolar ?? null;
+    const faixa_etaria = req.body.faixa_etaria ?? null;
+    const tipo_pedagogo = req.body.tipo_pedagogo ?? null;
 
     const senhaCriptografada = await bcrypt.hash(senha, 10);
 
@@ -92,8 +98,6 @@ app.get('/usuarios', (req, res) => {
     })
 });
 
-
-// Busca um usuário por id
 app.get('/usuarios/:id', (req, res) => {
     const {id} = req.params;
 
@@ -142,7 +146,7 @@ app.put('/usuarios/:id', (req, res) => {
         if (ano_escolar !== undefined || faixa_etaria !== undefined) {
             conexao.query(
                 `UPDATE Alunos SET ano_escolar = ?, faixa_etaria = ? WHERE id_usuario = ?`,
-                [ano_escolar, faixa_etaria, id],
+                [ano_escolar ?? null, faixa_etaria ?? null, id],
                 (erro) => {
                     if (erro) console.log(erro)
                 }

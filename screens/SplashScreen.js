@@ -1,55 +1,61 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, StatusBar } from "react-native";
-import { COLORS, SIZES } from "../styles/theme";
+import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import PressableScale from "../components/PressableScale";
+import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 
 export default function SplashScreen({ navigation }) {
   return (
-    <View style={styles.container}>
+    <View style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <Text style={styles.title}>EducaMente</Text>
 
-      <Text style={styles.title}>EducaMente</Text>
+        <View style={styles.middleSection}>
+          <Image
+            source={require("../assets/educamente-logo.gif")}
+            style={styles.mainLogo}
+            resizeMode="contain"
+          />
 
-      <View style={styles.middleSection}>
-        <Image
-          source={require("../assets/educamente-logo.gif")}
-          style={styles.mainLogo}
-          resizeMode="contain"
-        />
-
-        <View style={styles.sloganContainer}>
-          <Text style={styles.sloganYellow}>Mentes Saudáveis</Text>
-          <Text style={styles.sloganWhite}>Futuro Brilhante</Text>
+          <View style={styles.sloganContainer}>
+            <Text style={styles.sloganYellow}>Mentes Saudáveis</Text>
+            <Text style={styles.sloganWhite}>Futuro Brilhante</Text>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.buttonsSection}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.button}
-          onPress={() => navigation.navigate("Login", { role: "aluno" })}
-        >
-          <Text style={styles.buttonText}>Sou aluno</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonsSection}>
+          <PressableScale
+            style={styles.button}
+            onPress={() => navigation.navigate("Login", { role: "aluno" })}
+            accessibilityRole="button"
+          >
+            <Text style={styles.buttonText}>Sou aluno</Text>
+          </PressableScale>
 
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.button}
-          onPress={() => navigation.navigate("Login", { role: "educador" })}
-        >
-          <Text style={styles.buttonText}>Sou Educador</Text>
-        </TouchableOpacity>
-      </View>
+          <PressableScale
+            style={styles.button}
+            onPress={() => navigation.navigate("Login", { role: "educador" })}
+            accessibilityRole="button"
+          >
+            <Text style={styles.buttonText}>Sou Educador</Text>
+          </PressableScale>
+        </View>
+      </SafeAreaView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: COLORS.primary,
+  },
+  container: {
+    flex: 1,
     alignItems: "center",
     paddingHorizontal: SIZES.paddingScreen,
-    paddingTop: 64,
-    paddingBottom: 40,
+    paddingTop: SPACING.huge,
+    paddingBottom: SPACING.huge,
   },
   title: {
     fontSize: 32,
@@ -65,7 +71,7 @@ const styles = StyleSheet.create({
   mainLogo: {
     width: 180,
     height: 180,
-    marginBottom: 32,
+    marginBottom: SPACING.xxl,
   },
   sloganContainer: {
     alignItems: "center",
@@ -84,14 +90,15 @@ const styles = StyleSheet.create({
   },
   buttonsSection: {
     width: "100%",
+    gap: SPACING.md,
   },
   button: {
     backgroundColor: COLORS.accent,
     width: "100%",
-    paddingVertical: 16,
+    minHeight: TOUCH.min + 10,
     borderRadius: SIZES.radiusPill,
     alignItems: "center",
-    marginBottom: 16,
+    justifyContent: "center",
   },
   buttonText: {
     color: COLORS.white,
