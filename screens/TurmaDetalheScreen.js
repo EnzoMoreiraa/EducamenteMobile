@@ -8,7 +8,6 @@ import { AlertIcon, ChevronRightIcon } from "../components/IconSet";
 import { alunoPrecisaAtencao, getTurmaById, humorInfo } from "../data/turmasData";
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
-// Alunos da turma, com o último check-in de cada um em destaque
 export default function TurmaDetalheScreen({ navigation, route }) {
   const turma = getTurmaById(route?.params?.turmaId);
 

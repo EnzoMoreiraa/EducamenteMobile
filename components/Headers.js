@@ -3,7 +3,6 @@ import { BackIcon } from "./IconSet";
 import PressableScale from "./PressableScale";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Header verde usado em telas de autenticação (Login/Register)
 export function AuthHeader({ onBack }) {
   return (
     <View style={styles.authHeaderContainer}>
@@ -19,9 +18,6 @@ export function AuthHeader({ onBack }) {
   );
 }
 
-// Header simples usado em telas de conteúdo (Autocuidado, Check-in, Perfil...).
-// `right` aceita um nó opcional alinhado à direita — por exemplo, o botão
-// "Editar" do Perfil.
 export function ScreenHeader({ title, onBack, right }) {
   return (
     <View style={styles.screenHeaderContainer}>

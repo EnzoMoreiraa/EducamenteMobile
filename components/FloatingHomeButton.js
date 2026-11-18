@@ -4,20 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HomeIcon } from "./IconSet";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW_FLOATING } from "../styles/theme";
 
-// Altura da faixa invisivel que escuta o toque na regiao inferior.
-// As telas sem BottomTabBar reservam essa altura no fim do conteudo pra faixa
-// nunca ficar por cima de um botao ancorado no rodape.
 export const TRIGGER_HEIGHT = 28;
 
 const HIDDEN_OFFSET = 80;
 const VISIBLE_FOR = 3000;
 
-// Atalho para a Home presente em todas as telas depois dela.
-// Fica escondido até o usuário tocar a faixa inferior da tela; então a pílula
-// verde sobe (spring, translateY 80 -> 0) e desce sozinha depois de 3 segundos.
-//
-// bottomOffset — quanto subir a faixa/pílula pra não cobrir a BottomTabBar
-//                (as telas com barra passam TAB_BAR_HEIGHT)
 export default function FloatingHomeButton({
   navigation,
   bottomOffset = 0,
@@ -99,7 +90,6 @@ export default function FloatingHomeButton({
 }
 
 const styles = StyleSheet.create({
-  // Faixa invisível: é ela que "escuta" o toque na região inferior da tela
   trigger: {
     position: "absolute",
     left: 0,

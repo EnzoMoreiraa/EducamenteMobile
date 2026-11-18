@@ -6,10 +6,9 @@ import { ScreenHeader } from "../components/Headers";
 import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeButton";
 import PressableScale from "../components/PressableScale";
 import Toast from "../components/Toast";
+import { registrarCheckin } from "../services/checkins";
 import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 
-// Opções de humor, da esquerda (mais triste) para a direita (mais feliz),
-// espelhando as cores do arco no protótipo Figma.
 const MOODS = [
   { key: "muito_triste", label: "Me sinto muito mal", mouth: "M28 68 Q50 48 72 68", color: COLORS.moodVeryBad },
   { key: "triste", label: "Me sinto mal", mouth: "M30 66 Q50 55 70 66", color: COLORS.moodSad },
@@ -21,11 +20,10 @@ const MOODS = [
 const MAX_ARC_WIDTH = 320;
 
 export default function CheckinDiarioScreen({ navigation }) {
-  const [selectedIndex, setSelectedIndex] = useState(2); // começa em "neutro", como no protótipo
+  const [selectedIndex, setSelectedIndex] = useState(2);
   const [registrado, setRegistrado] = useState(false);
   const { width: windowWidth } = useWindowDimensions();
 
-  // O arco encolhe junto com a tela pra nunca ser cortado em telas de 375pt
   const arcWidth = Math.min(MAX_ARC_WIDTH, windowWidth - SIZES.paddingScreen * 2);
   const selectedMood = MOODS[selectedIndex];
 
@@ -50,7 +48,10 @@ export default function CheckinDiarioScreen({ navigation }) {
 
         <PressableScale
           style={styles.confirmButton}
-          onPress={() => setRegistrado(true)}
+          onPress={() => {
+            registrarCheckin(selectedMood.key);
+            setRegistrado(true);
+          }}
           accessibilityRole="button"
         >
           <Text style={styles.confirmButtonText}>Confirmar</Text>
@@ -71,7 +72,6 @@ export default function CheckinDiarioScreen({ navigation }) {
   );
 }
 
-// Rosto simples (olhos + boca) desenhado em SVG, no mesmo estilo "flat" do Figma
 function FaceIcon({ mouth, size = 62 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -82,7 +82,6 @@ function FaceIcon({ mouth, size = 62 }) {
   );
 }
 
-// Indicador de "arraste para escolher" — chevron duplo, como no protótipo
 function DoubleChevronDown() {
   return (
     <Svg width={26} height={18} viewBox="0 0 26 18">
@@ -92,7 +91,6 @@ function DoubleChevronDown() {
   );
 }
 
-// Arco de seleção de humor — 5 segmentos coloridos, tocáveis, com um indicador no centro
 function MoodArc({ width, selectedIndex, onSelect }) {
   const radius = width / 2 - 10;
   const height = radius + 20;
@@ -121,7 +119,6 @@ function MoodArc({ width, selectedIndex, onSelect }) {
     return { path, color, index };
   });
 
-  // Ângulo do indicador, apontando para o segmento selecionado
   const indicatorAngle = Math.PI - ((selectedIndex + 0.5) / segmentColors.length) * Math.PI;
   const indicatorX = cx + (radius - 18) * Math.cos(indicatorAngle);
   const indicatorY = cy - (radius - 18) * Math.sin(indicatorAngle);
@@ -203,7 +200,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: "auto",
-    // reserva a faixa de toque do FloatingHomeButton
     marginBottom: SPACING.xl + TRIGGER_HEIGHT,
   },
   confirmButtonText: {

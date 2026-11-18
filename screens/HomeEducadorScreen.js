@@ -12,9 +12,6 @@ import {
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 import { getUsuarioLogado } from "../services/session";
 
-// Painel inicial do portal pedagógico (equivalente à Home do aluno).
-// Os quatro atalhos usam o mesmo verde institucional — o que diferencia um do
-// outro é o ícone, não a cor.
 export default function HomeEducadorScreen({ navigation }) {
   const usuario = getUsuarioLogado();
   const nome = usuario ? `${usuario.nome} ${usuario.sobrenome ?? ""}`.trim() : "Equipe pedagógica";

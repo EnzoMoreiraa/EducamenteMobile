@@ -32,7 +32,6 @@ export default function LoginScreen({ navigation, route }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Entrada do formulário: vem da esquerda (é a aba da esquerda do seletor)
   const slide = useRef(new Animated.Value(-28)).current;
   const fade = useRef(new Animated.Value(0)).current;
 
@@ -43,7 +42,6 @@ export default function LoginScreen({ navigation, route }) {
     ]).start();
   }, [fade, slide]);
 
-  // Sai deslizando para a esquerda antes de trocar para o Cadastro
   const goToRegister = () => {
     Animated.parallel([
       Animated.timing(slide, { toValue: -32, duration: 170, useNativeDriver: true }),

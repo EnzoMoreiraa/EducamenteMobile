@@ -1,7 +1,6 @@
 import MessageComposer from "../components/MessageComposer";
 import { COLORS } from "../styles/theme";
 
-// Canal anônimo de apoio e denúncia (RF07)
 export default function AnonimoScreen({ navigation }) {
   return (
     <MessageComposer

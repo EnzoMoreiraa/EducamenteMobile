@@ -1,12 +1,3 @@
-// Conteúdos educativos de Autocuidado (RF05).
-//
-// Os quatro textos abaixo são derivados do TCC_Base_Teorica.md — psicoeducação
-// em Terapia Cognitivo-Comportamental adaptada ao contexto escolar. Futuramente
-// virão da entidade Conteudos_Educativos do back-end; a forma dos objetos aqui
-// já espelha as colunas da tabela (titulo, tipo, descricao).
-//
-// `cover` é a capa real exportada do Figma (assets/homePageAssets) — os cards
-// usam a imagem, não fundo colorido gerado em código.
 export const CONTEUDOS = [
   {
     id: "1",

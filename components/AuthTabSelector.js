@@ -5,9 +5,6 @@ import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 const TABS = ["Entrar", "Cadastrar-se"];
 const PADDING = 4;
 
-// Seletor "Entrar / Cadastrar-se" compartilhado por Login e Register.
-// A pílula branca desliza (Animated.spring) até a aba escolhida antes da
-// navegação acontecer, então a troca de tela já começa com o movimento certo.
 export default function AuthTabSelector({ activeIndex, onChange }) {
   const [trackWidth, setTrackWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;

@@ -1,14 +1,3 @@
-// Textos do Termo de Uso e da Política de Privacidade exibidos no cadastro.
-//
-// O EducaMente trata dados pessoais sensíveis (saúde mental) de adolescentes,
-// em sua maioria menores de 18 anos. Por isso os textos abaixo seguem a LGPD
-// (Lei 13.709/2018, em especial os arts. 11 e 14), o ECA e o dever de sigilo
-// da equipe pedagógica — incluindo os limites desse sigilo em situações de
-// risco à vida.
-//
-// Estes textos são a versão de trabalho do Projeto Integrador e devem ser
-// revisados pela coordenação do Senac São Leopoldo antes de uma publicação real.
-
 export const TERMOS_DE_USO = {
   title: "Termo de Uso",
   updatedAt: "Última atualização: agosto de 2026",

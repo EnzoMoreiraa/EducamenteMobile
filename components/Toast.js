@@ -3,8 +3,6 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 import { CheckIcon } from "./IconSet";
 import { COLORS, SIZES, SPACING, SHADOW_FLOATING } from "../styles/theme";
 
-// Snackbar verde que sobe da base da tela, fica 2s e desce sozinho.
-// Reutilizável: <Toast visible={x} message="..." onHide={() => setX(false)} />
 export default function Toast({
   visible,
   message,

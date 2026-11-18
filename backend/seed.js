@@ -1,10 +1,3 @@
-// Cria (ou atualiza) um usuário de cada tipo pra testar o login sem precisar
-// cadastrar na mão: um aluno e um pedagogo.
-//
-// Uso: cd backend && node seed.js
-//
-// É idempotente — rodar de novo só atualiza a senha e os dados dos dois.
-
 const bcrypt = require('bcrypt');
 const conexao = require('./dbconfig');
 

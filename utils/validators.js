@@ -1,5 +1,3 @@
-// Validações compartilhadas pelos formulários de Login e Cadastro
-
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export function isEmailValido(email) {
@@ -10,7 +8,6 @@ export function isVazio(valor) {
   return (valor ?? "").trim().length === 0;
 }
 
-// Rota inicial de cada perfil — o portal pedagógico tem uma Home própria
 export function rotaInicialPorTipo(tipoUsuario) {
   return tipoUsuario === "pedagogo" ? "HomeEducador" : "Home";
 }

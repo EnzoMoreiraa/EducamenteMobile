@@ -1,7 +1,6 @@
 import MessageComposer from "../components/MessageComposer";
 import { COLORS } from "../styles/theme";
 
-// Canal de comunicação identificado aluno -> coordenação (RF06)
 export default function IdentificadaScreen({ navigation }) {
   return (
     <MessageComposer

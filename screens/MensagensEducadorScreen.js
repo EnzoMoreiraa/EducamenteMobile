@@ -23,8 +23,6 @@ const STATUS_LABEL = {
   resolvido: { label: "Resolvida", color: COLORS.success, tint: COLORS.primarySoft },
 };
 
-// Caixa de entrada da equipe pedagógica (RF06 e RF07).
-// Mensagens anônimas nunca exibem o autor — aparecem como "Aluno Anônimo".
 export default function MensagensEducadorScreen({ navigation }) {
   const [filtro, setFiltro] = useState("todas");
 

@@ -3,12 +3,8 @@ import { Animated, StyleSheet, Text, TextInput, TouchableOpacity, View } from "r
 import { EyeIcon, EyeOffIcon } from "./IconSet";
 import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
 
-// Estados do contorno: 0 = repouso (cinza), 1 = foco (verde), 2 = erro (vermelho)
 const BORDER_COLORS = [COLORS.border, COLORS.primary, COLORS.danger];
 
-// Campo de texto padrão dos formulários: contorno animado (cinza -> verde no
-// foco, vermelho quando há erro), alvo de toque de 44pt e, para senhas,
-// botão de olho pra mostrar/ocultar.
 export default function AnimatedInput({
   label,
   value,
@@ -34,7 +30,7 @@ export default function AnimatedInput({
     Animated.timing(anim, {
       toValue: state,
       duration: 180,
-      useNativeDriver: false, // borderColor não é animável pelo driver nativo
+      useNativeDriver: false,
     }).start();
   }, [state, anim]);
 

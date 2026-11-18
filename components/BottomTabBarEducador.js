@@ -5,8 +5,6 @@ import { COLORS, SIZES, SPACING, TOUCH, SHADOW_FLOATING } from "../styles/theme"
 
 export const TAB_BAR_HEIGHT = 84;
 
-// Barra do portal pedagógico — mesma linguagem visual da barra do aluno,
-// só muda o conjunto de abas
 const TABS = [
   { key: "HomeEducador", label: "Início", Icon: HomeIcon },
   { key: "TurmasList", label: "Turmas", Icon: TurmasIcon },

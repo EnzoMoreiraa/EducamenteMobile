@@ -11,8 +11,6 @@ app.use(express.json());
 app.post('/usuarios', async (req, res) => {
     const {nome, sobrenome, email, senha, tipo_usuario} = req.body;
 
-    // Campos opcionais: o mysql2 recusa parâmetros undefined, então tudo que o
-    // formulário ainda não envia precisa virar NULL antes de chegar na query
     const ano_escolar = req.body.ano_escolar ?? null;
     const faixa_etaria = req.body.faixa_etaria ?? null;
     const tipo_pedagogo = req.body.tipo_pedagogo ?? null;
@@ -77,8 +75,6 @@ app.post('/usuarios', async (req, res) => {
     )
 });
 
-
-// Lista usuários
 app.get('/usuarios', (req, res) => {
     const sql = `SELECT Usuario.id_usuario, Usuario.nome, Usuario.sobrenome, Usuario.email,
     Usuario.tipo_usuario, Usuario.data_cadastro, Alunos.ano_escolar, Alunos.faixa_etaria,
@@ -127,8 +123,6 @@ app.get('/usuarios/:id', (req, res) => {
     })
 });
 
-
-// Atualiza os dados do usuário
 app.put('/usuarios/:id', (req, res) => {
     const {id} = req.params;
     const {nome, sobrenome, email, ano_escolar, faixa_etaria, tipo_pedagogo} = req.body;
@@ -169,8 +163,6 @@ app.put('/usuarios/:id', (req, res) => {
     });
 });
 
-
-// Exclui a conta (exige a senha correta)
 app.delete('/usuarios/:id', (req, res) => {
     const {id} = req.params;
     const {senha} = req.body;
@@ -214,7 +206,6 @@ app.delete('/usuarios/:id', (req, res) => {
     });
 });
 
-
 app.post('/login', (req, res) => {
     const {email, senha} = req.body;
 
@@ -250,7 +241,6 @@ app.post('/login', (req, res) => {
         });
     });
 });
-
 
 app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');

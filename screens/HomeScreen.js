@@ -20,8 +20,6 @@ const CARD_WIDTH = 250;
 const CARD_GAP = SPACING.md - 2;
 const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
 
-// Acima dessa largura (tablet, web) o carrossel horizontal deixa muito espaço
-// vazio embaixo — os conteúdos passam a ocupar uma grade de 2 colunas
 const WIDE_LAYOUT_BREAKPOINT = 600;
 
 export default function HomeScreen({ navigation }) {
@@ -31,7 +29,6 @@ export default function HomeScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const isWide = width >= WIDE_LAYOUT_BREAKPOINT;
 
-  // Índice do card centralizado, pra sincronizar os "dots" de paginação
   const handleScroll = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / SNAP_INTERVAL);
     if (index !== activeIndex && index >= 0 && index < CONTEUDOS.length) {
@@ -153,8 +150,6 @@ function SectionTitle({ icon, label }) {
   );
 }
 
-// Card de conteúdo: a capa real exportada do Figma em cima e o texto embaixo,
-// no card branco de sempre — sem fundo colorido gerado em código
 function ConteudoCard({ conteudo, onPress, style }) {
   return (
     <PressableScale
@@ -311,7 +306,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: CARD_GAP,
     paddingHorizontal: SIZES.paddingScreen,
-    // trava a largura pra que, num monitor grande, o card não vire um painel
     width: "100%",
     maxWidth: 820,
     alignSelf: "center",

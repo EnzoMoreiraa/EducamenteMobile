@@ -8,8 +8,6 @@ import Icon, { ClockIcon } from "../components/IconSet";
 import { CONTEUDOS, getConteudoById } from "../data/conteudosData";
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
-// Leitor de conteúdo educativo (RF05). O card tocado na Home manda o id pela
-// rota; sem parâmetro, abre o primeiro conteúdo da lista.
 export default function AutocuidadoScreen({ navigation, route }) {
   const conteudo = getConteudoById(route?.params?.conteudoId);
   const outros = CONTEUDOS.filter((item) => item.id !== conteudo.id);

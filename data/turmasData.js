@@ -1,14 +1,5 @@
 import { COLORS } from "../styles/theme";
 
-// Dados fixos do portal pedagógico.
-//
-// Ainda não existe API para turmas, agendamentos do educador e caixa de
-// mensagens; este arquivo é a fonte única desses dados enquanto isso. A forma
-// dos objetos acompanha o Diagrama ER (Alunos, Agendamento, Status_Atendimento,
-// Checkin_Emocional, Mensagem_Identificada e Mensagem_Anonima), pra troca pelo
-// back-end ser só substituir a origem.
-
-// Escala de humor compartilhada com o check-in do aluno
 export const HUMORES = {
   muito_bem: { label: "Muito bem", color: COLORS.moodHappy },
   bem: { label: "Bem", color: COLORS.moodHappy },
@@ -17,7 +8,6 @@ export const HUMORES = {
   muito_mal: { label: "Muito mal", color: COLORS.moodVeryBad },
 };
 
-// Humores que a equipe acompanha de perto
 const HUMORES_DE_ATENCAO = ["mal", "muito_mal"];
 
 export function humorInfo(chave) {
@@ -227,8 +217,6 @@ export const TURMAS = [
   },
 ];
 
-// Mensagens recebidas pela equipe pedagógica (RF06 e RF07).
-// As anônimas não têm aluno vinculado — o portal mostra "Aluno Anônimo".
 export const MENSAGENS = [
   {
     id: "m1",
@@ -304,10 +292,6 @@ export const MENSAGENS = [
   },
 ];
 
-// ---------------------------------------------------------------------------
-// Seletores — o portal consome sempre por estas funções, nunca pelo array cru
-// ---------------------------------------------------------------------------
-
 export function getTurmaById(id) {
   return TURMAS.find((turma) => turma.id === id) ?? TURMAS[0];
 }
@@ -324,8 +308,6 @@ export function alunoPrecisaAtencao(aluno) {
   return HUMORES_DE_ATENCAO.includes(aluno.ultimoCheckin?.humor);
 }
 
-// Badge de pendências da turma: alunos em humor de atenção + agendamentos
-// aguardando resposta da equipe
 export function contarPendentes(turma) {
   const emAtencao = turma.alunos.filter(alunoPrecisaAtencao).length;
   const agendamentosPendentes = turma.alunos.reduce(
@@ -336,7 +318,6 @@ export function contarPendentes(turma) {
   return emAtencao + agendamentosPendentes;
 }
 
-// Todos os agendamentos, achatados e com o aluno/turma junto
 export function getAgendamentos() {
   return TURMAS.flatMap((turma) =>
     turma.alunos.flatMap((aluno) =>

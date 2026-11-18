@@ -3,8 +3,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CalendarIcon, ChatIcon, HomeIcon, HeartIcon, ProfileIcon } from "./IconSet";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW_FLOATING } from "../styles/theme";
 
-// Altura aproximada da barra (sem o inset inferior) — telas usam esse valor
-// pra afastar do rodapé conteúdo flutuante, como o FloatingHomeButton
 export const TAB_BAR_HEIGHT = 84;
 
 const TABS = [
@@ -15,7 +13,6 @@ const TABS = [
   { key: "Profile", label: "Perfil", Icon: ProfileIcon },
 ];
 
-// Barra fixada no rodapé das telas internas do app (a partir da Home)
 export default function BottomTabBar({ navigation, active }) {
   const insets = useSafeAreaInsets();
 
@@ -35,9 +32,6 @@ export default function BottomTabBar({ navigation, active }) {
   );
 }
 
-// Cada aba é só o alvo de toque: ícone de 24pt centralizado e rótulo abaixo.
-// O estado ativo é o ícone preenchido em verde sobre o círculo claro; o
-// inativo é o mesmo desenho em contorno cinza.
 function TabItem({ tab, isActive, onPress }) {
   const { Icon, label } = tab;
 

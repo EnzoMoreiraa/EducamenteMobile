@@ -8,8 +8,6 @@ import { ChevronRightIcon, TurmasIcon } from "../components/IconSet";
 import { TURMAS, contarPendentes } from "../data/turmasData";
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
-// Lista de turmas com o selo de pendências (alunos em humor de atenção +
-// agendamentos aguardando resposta)
 export default function TurmasListScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>

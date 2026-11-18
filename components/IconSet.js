@@ -1,19 +1,6 @@
 import Svg, { Path, Circle, Rect, Line } from "react-native-svg";
 import { COLORS } from "../styles/theme";
 
-// Conjunto de ícones próprios do EducaMente, desenhados em SVG (react-native-svg).
-//
-// Todos seguem o mesmo grid de 24x24, traço entre 1.5 e 2.0 (padrão 1.8) e
-// pontas arredondadas, pra manterem a mesma "voz" visual do resto do app.
-// Desenho de linha, sem detalhe miúdo: no tamanho de uso (18 a 26pt) só a
-// silhueta sobrevive.
-//
-// Props comuns a todos os ícones:
-//   size   — lado do quadrado em pt (default 24)
-//   color  — cor do traço (default cinza de texto secundário)
-//   filled — quando true, a silhueta principal recebe um preenchimento suave
-//            da própria cor (usado, por exemplo, na aba ativa da BottomTabBar)
-
 const DEFAULT_SIZE = 24;
 const STROKE_WIDTH = 1.8;
 const FILL_OPACITY = 0.16;
@@ -26,7 +13,6 @@ function Frame({ size = DEFAULT_SIZE, children }) {
   );
 }
 
-// Props de traço compartilhadas por todos os desenhos
 function stroke(color, width = STROKE_WIDTH) {
   return {
     stroke: color,
@@ -36,7 +22,6 @@ function stroke(color, width = STROKE_WIDTH) {
   };
 }
 
-// Preenchimento suave da silhueta principal quando o ícone está "ativo"
 function body(color, filled) {
   return {
     fill: filled ? color : "none",
@@ -103,8 +88,6 @@ export function ProfileIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// "User" é o rosto do canal identificado — mesma família do ProfileIcon,
-// mas dentro de um círculo, pra ler como "identidade revelada"
 export function UserIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -115,7 +98,6 @@ export function UserIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Máscara de baile (domino) — canal anônimo
 export function MaskIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -212,7 +194,6 @@ export function SaveIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Grupo de alunos — usado no portal pedagógico
 export function TurmasIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -227,7 +208,6 @@ export function TurmasIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Agenda do educador — calendário com confirmação
 export function AgendaIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -328,7 +308,6 @@ export function AlertIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Histórico — relógio com seta de "voltar no tempo"
 export function HistoryIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -382,7 +361,6 @@ export function SearchIcon({ size, color = COLORS.textGray }) {
   );
 }
 
-// Conteúdo educativo (Autocuidado)
 export function BookIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -396,7 +374,6 @@ export function BookIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Check-in emocional
 export function SmileIcon({ size, color = COLORS.textGray, filled = false }) {
   return (
     <Frame size={size}>
@@ -408,8 +385,6 @@ export function SmileIcon({ size, color = COLORS.textGray, filled = false }) {
   );
 }
 
-// Mapa nome -> componente, pra telas que escolhem o ícone por dado
-// (ex.: grid 2x2 do portal pedagógico)
 export const ICONS = {
   home: HomeIcon,
   calendar: CalendarIcon,
@@ -445,7 +420,6 @@ export const ICONS = {
   smile: SmileIcon,
 };
 
-// Uso: <Icon name="turmas" size={26} color={COLORS.primary} filled />
 export default function Icon({ name, ...props }) {
   const Component = ICONS[name];
   if (!Component) return null;

@@ -16,8 +16,6 @@ const STATUS = {
   recusado: { label: "Recusado", color: COLORS.danger, tint: COLORS.dangerSoft },
 };
 
-// Fila de agendamentos solicitados pelos alunos (RF08).
-// A decisão fica em estado local até existir o endpoint de Status_Atendimento.
 export default function AgendamentosEducadorScreen({ navigation }) {
   const [agendamentos, setAgendamentos] = useState(() => getAgendamentos());
   const [toast, setToast] = useState("");

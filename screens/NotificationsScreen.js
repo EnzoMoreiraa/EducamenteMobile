@@ -6,8 +6,6 @@ import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeBu
 import { BellIcon } from "../components/IconSet";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Preferências de notificação — futuramente persistidas na tabela
-// Preferencia_Notificacao do back-end (RF09)
 const PREFERENCES_CONFIG = [
   {
     key: "checkinReminder",

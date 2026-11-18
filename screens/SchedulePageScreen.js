@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,19 +21,33 @@ const IS_WEB = Platform.OS === "web";
 
 export default function SchedulePageScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
+  const [avoidKeyboard, setAvoidKeyboard] = useState(false);
+
+  const sheetHeight = useRef(0);
+  const fieldLayouts = useRef({});
+
+  const registerLayout = (key) => (event) => {
+    fieldLayouts.current[key] = event.nativeEvent.layout;
+  };
+
+  const handleFocus = (key) => () => {
+    const layout = fieldLayouts.current[key];
+    if (!layout) return;
+    const centroNaTela = windowHeight - sheetHeight.current + layout.y + layout.height / 2;
+    setAvoidKeyboard(centroNaTela > windowHeight / 2);
+  };
 
   const [title, setTitle] = useState("");
   const [teacher, setTeacher] = useState("");
   const [subject, setSubject] = useState("");
   const [date, setDate] = useState(null);
-  const [dateText, setDateText] = useState(""); // só no web, onde não há picker nativo
+  const [dateText, setDateText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const [time, setTime] = useState("");
   const [remindMe, setRemindMe] = useState(false);
   const [erro, setErro] = useState("");
 
-  // No Android o picker é um modal do sistema e fecha sozinho na escolha;
-  // no iOS ele fica aberto (spinner) até o "Pronto".
   const handleDateChange = (event, selecionada) => {
     if (Platform.OS !== "ios") setShowPicker(false);
     if (event?.type === "dismissed") return;
@@ -55,8 +70,6 @@ export default function SchedulePageScreen({ navigation }) {
       return;
     }
 
-    // O agendamento vai pronto pra tela do calendário — e, quando houver
-    // back-end, é esse mesmo objeto que alimenta POST /agendamentos
     navigation.navigate("Calendar", {
       novoAgendamento: {
         id: `novo-${Date.now()}`,
@@ -76,7 +89,8 @@ export default function SchedulePageScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       style={styles.overlay}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      enabled={avoidKeyboard}
     >
       <TouchableOpacity
         style={styles.backdrop}
@@ -85,12 +99,19 @@ export default function SchedulePageScreen({ navigation }) {
         accessibilityLabel="Fechar"
       />
 
-      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, SPACING.xl) }]}>
+      <View
+        style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, SPACING.xl) }]}
+        onLayout={(event) => {
+          sheetHeight.current = event.nativeEvent.layout.height;
+        }}
+      >
         <View style={styles.grabber} />
         <Text style={styles.title}>Agende uma conversa</Text>
 
         <TextInput
           style={styles.input}
+          onLayout={registerLayout("title")}
+          onFocus={handleFocus("title")}
           placeholder="Insira um título"
           placeholderTextColor={COLORS.placeholder}
           value={title}
@@ -99,6 +120,8 @@ export default function SchedulePageScreen({ navigation }) {
 
         <TextInput
           style={styles.input}
+          onLayout={registerLayout("teacher")}
+          onFocus={handleFocus("teacher")}
           placeholder="Adicionar um professor (Opcional)"
           placeholderTextColor={COLORS.placeholder}
           value={teacher}
@@ -107,6 +130,8 @@ export default function SchedulePageScreen({ navigation }) {
 
         <TextInput
           style={[styles.input, styles.textArea]}
+          onLayout={registerLayout("subject")}
+          onFocus={handleFocus("subject")}
           placeholder="Escrever o assunto (Opcional)"
           placeholderTextColor={COLORS.placeholder}
           value={subject}
@@ -117,9 +142,10 @@ export default function SchedulePageScreen({ navigation }) {
         />
 
         {IS_WEB ? (
-          <View style={styles.dateFieldRow}>
+          <View style={styles.dateFieldRow} onLayout={registerLayout("date")}>
             <TextInput
               style={styles.dateTextInput}
+              onFocus={handleFocus("date")}
               placeholder="Data (dd/mm/aaaa)"
               placeholderTextColor={COLORS.placeholder}
               value={dateText}
@@ -166,6 +192,8 @@ export default function SchedulePageScreen({ navigation }) {
 
         <TextInput
           style={styles.input}
+          onLayout={registerLayout("time")}
+          onFocus={handleFocus("time")}
           placeholder="Horário (Opcional) — ex: 14:30"
           placeholderTextColor={COLORS.placeholder}
           value={time}

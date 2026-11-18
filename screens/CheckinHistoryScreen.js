@@ -1,22 +1,16 @@
+import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "../components/Headers";
 import FloatingHomeButton, { TRIGGER_HEIGHT } from "../components/FloatingHomeButton";
 import { HistoryIcon } from "../components/IconSet";
+import { getCheckins, HUMORES } from "../services/checkins";
+import { formatarDataLonga } from "../utils/datas";
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
-// Histórico mockado — futuramente virá da entidade Checkin_Emocional do back-end.
-// Hoje o check-in é só a escala de humor; futuramente será um questionário completo (RF04).
-const HISTORY = [
-  { id: "1", date: "12 de Julho, 2026", label: "Me sinto bem", color: COLORS.moodHappy },
-  { id: "2", date: "11 de Julho, 2026", label: "Me sinto neutro", color: COLORS.moodNeutral },
-  { id: "3", date: "10 de Julho, 2026", label: "Me sinto mal", color: COLORS.moodSad },
-  { id: "4", date: "9 de Julho, 2026", label: "Me sinto muito bem", color: COLORS.moodHappy },
-  { id: "5", date: "8 de Julho, 2026", label: "Me sinto neutro", color: COLORS.moodNeutral },
-  { id: "6", date: "7 de Julho, 2026", label: "Me sinto muito mal", color: COLORS.moodVeryBad },
-];
-
 export default function CheckinHistoryScreen({ navigation }) {
+  const [historico] = useState(getCheckins);
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScreenHeader title="Histórico de Check-in" onBack={() => navigation.goBack()} />
@@ -30,15 +24,18 @@ export default function CheckinHistoryScreen({ navigation }) {
           </Text>
         </View>
 
-        {HISTORY.map((item) => (
-          <View key={item.id} style={styles.historyCard}>
-            <View style={[styles.moodDot, { backgroundColor: item.color }]} />
-            <View style={styles.historyTextBlock}>
-              <Text style={styles.historyLabel}>{item.label}</Text>
-              <Text style={styles.historyDate}>{item.date}</Text>
+        {historico.map((item) => {
+          const humor = HUMORES[item.humor];
+          return (
+            <View key={item.id} style={styles.historyCard}>
+              <View style={[styles.moodDot, { backgroundColor: humor.color }]} />
+              <View style={styles.historyTextBlock}>
+                <Text style={styles.historyLabel}>{humor.label}</Text>
+                <Text style={styles.historyDate}>{formatarDataLonga(item.data)}</Text>
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </ScrollView>
 
       <FloatingHomeButton navigation={navigation} />

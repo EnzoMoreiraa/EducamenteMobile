@@ -11,7 +11,6 @@ import { COLORS, SIZES, SPACING, TOUCH, SHADOW, SHADOW_FLOATING } from "../style
 
 const WEEK_DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
-// Dados de exemplo — virão da entidade "Agendamento" no back-end (relacionada a Aluno + Pedagogo)
 const APPOINTMENTS = [
   {
     id: "1",
@@ -31,7 +30,6 @@ const APPOINTMENTS = [
   },
 ];
 
-// Dias do mês com indicadores de quantidade de agendamentos (bolinhas)
 const DAYS_WITH_DOTS = {
   3: 2,
   8: 1,
@@ -45,11 +43,10 @@ const DAYS_WITH_DOTS = {
 };
 
 export default function CalendarPageScreen({ navigation, route }) {
-  const [monthIndex, setMonthIndex] = useState(4); // Maio
+  const [monthIndex, setMonthIndex] = useState(4);
   const [selectedDay, setSelectedDay] = useState(2);
   const [extras, setExtras] = useState([]);
 
-  // Agendamento criado no modal "Agende uma conversa" chega pela rota
   const novoAgendamento = route?.params?.novoAgendamento;
   useEffect(() => {
     if (!novoAgendamento) return;
@@ -63,7 +60,6 @@ export default function CalendarPageScreen({ navigation, route }) {
     navigation.setParams({ novoAgendamento: undefined });
   }, [novoAgendamento, navigation]);
 
-  // Lista exibida: os exemplos fixos mais o que o aluno acabou de agendar
   const agendamentos = [
     ...APPOINTMENTS,
     ...extras.map((item) => ({
@@ -76,7 +72,6 @@ export default function CalendarPageScreen({ navigation, route }) {
     })),
   ];
 
-  // Layout fixo de exemplo replicando o protótipo (Maio/2026 começando na quarta)
   const calendarGrid = [
     [31, 30, 1, 2, 3, 4, 5],
     [6, 7, 8, 9, 10, 11, 12],
@@ -84,7 +79,7 @@ export default function CalendarPageScreen({ navigation, route }) {
     [20, 21, 22, 23, 24, 25, 26],
     [27, 28, 29, 30, 31, 1, 2],
   ];
-  const fadedDays = [31, 30, 1, 2]; // dias do mês anterior/seguinte exibidos em cinza
+  const fadedDays = [31, 30, 1, 2];
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -184,8 +179,6 @@ export default function CalendarPageScreen({ navigation, route }) {
 
       <FloatingHomeButton navigation={navigation} bottomOffset={TAB_BAR_HEIGHT} />
 
-      {/* FAB no canto inferior direito pra não disputar espaço com o atalho de Home.
-          Vem depois do FloatingHomeButton pra ficar por cima da faixa de toque dele. */}
       <PressableScale
         style={styles.fab}
         onPress={() => navigation.navigate("SchedulePage")}

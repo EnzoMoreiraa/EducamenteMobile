@@ -1,9 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 
-// Padrão decorativo sutil pra telas de fundo sólido (verde institucional).
-// Círculos e ondas em branco com ~3% de opacidade — dá profundidade sem
-// competir com o conteúdo. Renderiza atrás de tudo (pointerEvents none).
 export default function BackgroundPattern({
   height = 260,
   color = "#FFFFFF",

@@ -7,8 +7,6 @@ import PressableScale from "../components/PressableScale";
 import { ChevronRightIcon, MaskIcon, UserIcon } from "../components/IconSet";
 import { COLORS, SIZES, SPACING, SHADOW } from "../styles/theme";
 
-// Hub de entrada do canal de comunicação — escolha entre mensagem anônima (RF07)
-// ou identificada (RF06) antes de abrir o formulário
 const OPCOES = [
   {
     key: "Anonimo",
@@ -39,22 +37,24 @@ export default function ChatScreen({ navigation }) {
           mesmas pessoas.
         </Text>
 
-        <View style={styles.cardsRow}>
+        <View style={styles.cardsList}>
           {OPCOES.map(({ key, title, description, Icon, tint, color }) => (
             <PressableScale
               key={key}
-              style={[styles.card, { backgroundColor: tint }]}
+              style={styles.card}
               onPress={() => navigation.navigate(key)}
               accessibilityRole="button"
               accessibilityLabel={`Mensagem ${title}`}
             >
-              <View style={[styles.cardIcon, { backgroundColor: color }]}>
-                <Icon size={26} color={COLORS.white} />
-              </View>
-              <Text style={[styles.cardTitle, { color }]}>{title}</Text>
-              <Text style={styles.cardDescription}>{description}</Text>
-              <View style={styles.cardArrow}>
-                <ChevronRightIcon size={18} color={color} />
+              <View style={[styles.cardInner, { backgroundColor: tint }]}>
+                <View style={[styles.cardIcon, { backgroundColor: color }]}>
+                  <Icon size={26} color={COLORS.white} />
+                </View>
+                <View style={styles.cardText}>
+                  <Text style={[styles.cardTitle, { color }]}>{title}</Text>
+                  <Text style={styles.cardDescription}>{description}</Text>
+                </View>
+                <ChevronRightIcon size={20} color={color} />
               </View>
             </PressableScale>
           ))}
@@ -83,16 +83,21 @@ const styles = StyleSheet.create({
     color: COLORS.textGray,
     marginBottom: SPACING.lg,
   },
-  cardsRow: {
-    flexDirection: "row",
-    gap: SPACING.sm,
+  cardsList: {
+    gap: SPACING.md,
   },
   card: {
-    flex: 1,
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: SIZES.radiusMedium,
+    ...SHADOW,
+  },
+  cardInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.md,
     borderRadius: SIZES.radiusMedium,
     padding: SPACING.md,
-    minHeight: 180,
-    ...SHADOW,
+    minHeight: 96,
   },
   cardIcon: {
     width: 48,
@@ -100,7 +105,9 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: SPACING.sm,
+  },
+  cardText: {
+    flex: 1,
   },
   cardTitle: {
     fontSize: 16,
@@ -109,12 +116,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xxs,
   },
   cardDescription: {
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 13,
+    lineHeight: 18,
     color: COLORS.textGray,
-  },
-  cardArrow: {
-    marginTop: "auto",
-    alignSelf: "flex-end",
   },
 });

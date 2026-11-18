@@ -37,9 +37,8 @@ export default function RegisterScreen({ navigation, route }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [legalDoc, setLegalDoc] = useState(null); // "termos" | "privacidade" | null
+  const [legalDoc, setLegalDoc] = useState(null);
 
-  // Entrada do formulário: vem da direita (é a aba da direita do seletor)
   const slide = useRef(new Animated.Value(28)).current;
   const fade = useRef(new Animated.Value(0)).current;
 
@@ -61,7 +60,6 @@ export default function RegisterScreen({ navigation, route }) {
     if (fieldErrors[campo]) setFieldErrors((prev) => ({ ...prev, [campo]: undefined }));
   };
 
-  // Cada falha acende o campo correspondente em vermelho com a mensagem própria
   const validar = () => {
     const erros = {};
 
@@ -107,7 +105,6 @@ export default function RegisterScreen({ navigation, route }) {
       const data = await response.json();
 
       if (!response.ok) {
-        // E-mail duplicado volta do back-end como 409 — mostra no campo certo
         if (response.status === 409) {
           setFieldErrors((prev) => ({ ...prev, email: data.mensagem }));
         } else {

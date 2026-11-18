@@ -2,7 +2,6 @@ import { Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import PressableScale from "./PressableScale";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Modal de confirmação reutilizável (ex.: excluir conta, descartar alterações)
 export default function ConfirmModal({
   visible,
   title,

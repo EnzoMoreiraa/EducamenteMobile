@@ -13,7 +13,6 @@ const STATUS_LABEL = {
   recusado: { label: "Recusado", color: COLORS.danger, tint: COLORS.dangerSoft },
 };
 
-// Ficha do aluno: identificação, histórico de check-ins e agendamentos
 export default function AlunoDetalheScreen({ navigation, route }) {
   const aluno = getAlunoById(route?.params?.alunoId);
 

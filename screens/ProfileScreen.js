@@ -56,7 +56,6 @@ export default function ProfileScreen({ navigation }) {
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  // Transição entre "visualizando" e "editando": some, troca, volta
   const anim = useRef(new Animated.Value(1)).current;
   const translateY = anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] });
 

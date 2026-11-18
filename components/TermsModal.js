@@ -5,8 +5,6 @@ import PressableScale from "./PressableScale";
 import { LEGAL_DOCS } from "../data/legalTexts";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Modal de leitura do Termo de Uso / Política de Privacidade.
-// O botão "Li e aceito" fecha o modal e já marca o checkbox do cadastro.
 export default function TermsModal({ visible, doc = "termos", onAccept, onClose }) {
   const insets = useSafeAreaInsets();
   const content = LEGAL_DOCS[doc] ?? LEGAL_DOCS.termos;

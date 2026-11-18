@@ -25,28 +25,6 @@ import MensagensEducadorScreen from "../screens/MensagensEducadorScreen";
 
 const Stack = createNativeStackNavigator();
 
-// Fluxo confirmado:
-//
-// Splash -> Login/Register -> Home (aluno) | HomeEducador (pedagogo)
-//
-// Depois do login bem-sucedido, Login e Register chamam
-// `rotaInicialPorTipo(tipo_usuario)` (utils/validators.js), que devolve
-// "HomeEducador" quando tipo_usuario === "pedagogo" e "Home" no caso do aluno.
-// É por isso que as duas Homes convivem no mesmo stack: o perfil do usuário é
-// que decide qual delas abre.
-//
-// App do aluno:
-//   Home -> Calendar | Chat | Autocuidado | Profile | CheckinDiario
-//   Calendar -> SchedulePage (modal "+")
-//   Chat (hub) -> Anonimo (RF07) | Identificada (RF06)
-//   Profile -> CheckinHistory | Notifications  (a edição de dados é inline)
-//
-// Portal pedagógico:
-//   HomeEducador -> TurmasList | AgendamentosEducador | MensagensEducador | Profile
-//   TurmasList -> TurmaDetalhe -> AlunoDetalhe
-//
-// Profile é compartilhado pelos dois perfis: a tela escolhe a barra inferior
-// (aluno ou educador) a partir do tipo_usuario da sessão.
 export default function AppNavigator() {
   return (
     <NavigationContainer>

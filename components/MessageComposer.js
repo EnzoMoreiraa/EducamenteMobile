@@ -15,10 +15,6 @@ import PressableScale from "./PressableScale";
 import Toast from "./Toast";
 import { COLORS, SIZES, SPACING, TOUCH, SHADOW } from "../styles/theme";
 
-// Formulário compartilhado por AnonimoScreen e IdentificadaScreen (RF06/RF07).
-// É de propósito curto: título opcional, espaço pra escrever e o botão de
-// enviar. Nada de barra de ferramentas ou aviso — a tela tem que acolher,
-// não parecer um formulário a preencher.
 export default function MessageComposer({
   title,
   caption,
@@ -191,7 +187,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "600",
     marginTop: SPACING.sm,
-    // reserva a faixa de toque do FloatingHomeButton
     marginBottom: SPACING.md + TRIGGER_HEIGHT,
   },
 });
