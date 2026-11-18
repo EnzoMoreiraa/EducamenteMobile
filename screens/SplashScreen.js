@@ -1,4 +1,5 @@
-import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PressableScale from "../components/PressableScale";
 import { COLORS, SIZES, SPACING, TOUCH } from "../styles/theme";
@@ -14,7 +15,8 @@ export default function SplashScreen({ navigation }) {
           <Image
             source={require("../assets/educamente-logo.gif")}
             style={styles.mainLogo}
-            resizeMode="contain"
+            contentFit="contain"
+            autoplay
           />
 
           <View style={styles.sloganContainer}>

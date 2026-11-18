@@ -42,7 +42,7 @@ export default function BackgroundPattern({
 
 const styles = StyleSheet.create({
   layer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     bottom: undefined,
     overflow: "hidden",
   },
