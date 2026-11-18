@@ -47,9 +47,6 @@ cd ..
    ou no terminal: `mysql -u root -p < database/schema.sql`).
 2. Ele cria o banco `sistema_atendimento` com todas as tabelas.
 
-> ⚠️ O `schema.sql` começa com `DROP DATABASE IF EXISTS` — rodar de novo **apaga
-> todos os dados** do banco.
-
 ### 5. Configurar a conexão com o banco
 
 Abra `backend/dbconfig.js` e confira usuário e senha do MySQL:

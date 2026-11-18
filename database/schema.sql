@@ -1,5 +1,4 @@
 -- Active: 1751945461934@@127.0.0.1@3306
-DROP DATABASE IF EXISTS sistema_atendimento;
 CREATE DATABASE sistema_atendimento;
 USE sistema_atendimento;
 
